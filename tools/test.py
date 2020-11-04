@@ -1,7 +1,7 @@
 import argparse
 import os
 import warnings
-
+import json
 import mmcv
 import torch
 from mmcv import Config, DictAction
@@ -198,8 +198,10 @@ def main():
             for key in ['interval', 'tmpdir', 'start', 'gpu_collect']:
                 eval_kwargs.pop(key, None)
             eval_kwargs.update(dict(metric=args.eval, **kwargs))
-            print(dataset.evaluate(outputs, **eval_kwargs))
-
+            res=dataset.evaluate(outputs, **eval_kwargs)
+            print(res)
+            with open('res.json', 'w') as outfile:
+                json.dump(res,outfile,indent=4,ensure_ascii = False)
 
 if __name__ == '__main__':
     main()
