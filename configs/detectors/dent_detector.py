@@ -31,89 +31,6 @@ model = dict(
             pretrained='torchvision://resnet50',
             style='pytorch')))
 
-train_cfg = dict(
-    rpn=dict(
-        assigner=dict(
-            type='MaxIoUAssigner',
-            pos_iou_thr=0.7,
-            neg_iou_thr=0.3,
-            min_pos_iou=0.3,
-            ignore_iof_thr=-1),
-        sampler=dict(
-            type='RandomSampler',
-            num=256,
-            pos_fraction=0.5,
-            neg_pos_ub=-1,
-            add_gt_as_proposals=False),
-        allowed_border=0,
-        pos_weight=-1,
-        debug=False),
-    rpn_proposal=dict(
-        nms_across_levels=False,
-        nms_pre=2000,
-        nms_post=2000,
-        max_num=2000,
-        nms_thr=0.7,
-        min_bbox_size=0),
-    rcnn=[
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.5,
-                neg_iou_thr=0.5,
-                min_pos_iou=0.5,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='RandomSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.6,
-                neg_iou_thr=0.6,
-                min_pos_iou=0.6,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='RandomSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False),
-        dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.7,
-                neg_iou_thr=0.7,
-                min_pos_iou=0.7,
-                ignore_iof_thr=-1),
-            sampler=dict(
-                type='RandomSampler',
-                num=512,
-                pos_fraction=0.25,
-                neg_pos_ub=-1,
-                add_gt_as_proposals=True),
-            pos_weight=-1,
-            debug=False)
-    ],
-    stage_loss_weights=[1, 0.5, 0.25])
-test_cfg = dict(
-    rpn=dict(
-        nms_across_levels=False,
-        nms_pre=1000,
-        nms_post=1000,
-        max_num=1000,
-        nms_thr=0.7,
-        min_bbox_size=0),
-    rcnn=dict(
-        score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100),
-    keep_all_stages=False)
 
 classes=['dent']
 dataset_type = 'CocoDataset'
@@ -145,37 +62,42 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-val_pipeline = [
-    dict(type='LoadImageFromFile'),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
-    dict(type='RandomFlip', flip_ratio=0.5),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size_divisor=32),
-    dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
-]
+# val_pipeline = [
+#     dict(type='LoadImageFromFile'),
+#     dict(type='LoadAnnotations', with_bbox=True),
+#     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
+#     dict(type='RandomFlip', flip_ratio=0.5),
+#     dict(type='Normalize', **img_norm_cfg),
+#     dict(type='Pad', size_divisor=32),
+#     dict(type='DefaultFormatBundle'),
+#     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
+# ]
+
+
 data = dict(
     imgs_per_gpu=2,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
         classes=classes,
+        test_mode=False,
         ann_file=data_root + 'train_total.json',
         img_prefix=data_root + 'images/',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
         classes=classes,
+        test_mode=False,
         ann_file=data_root + 'valid_total.json',
         #worflow = [('train', 1), ('val', 1)],
         img_prefix=data_root + 'images/',
-        pipeline=val_pipeline),
+        pipeline=train_pipeline),
     test=dict(
         type=dataset_type,
         classes=classes,
+        test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'test_total.json',
+        ann_file=data_root + 'valid_total.json',
         img_prefix=data_root + 'images/',
         pipeline=test_pipeline))
 # optimizer
@@ -206,4 +128,4 @@ work_dir = './work_dirs/dent_detector'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
-worflow = [('train', 1), ('val', 1)]
+workflow = [('train', 1), ('val', 1)]
