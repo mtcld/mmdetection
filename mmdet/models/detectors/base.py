@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
-
+from torch import Tensor
 import mmcv
 import numpy as np
 import torch
@@ -127,6 +127,11 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 augs (multiscale, flip, etc.) and the inner list indicates
                 images in a batch.
         """
+        
+        if isinstance(imgs, Tensor):
+            imgs = [imgs]
+            img_metas = [img_metas]
+            
         for var, name in [(imgs, 'imgs'), (img_metas, 'img_metas')]:
             if not isinstance(var, list):
                 raise TypeError(f'{name} must be a list, but got {type(var)}')
