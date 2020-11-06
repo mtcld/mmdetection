@@ -7,7 +7,8 @@ import mmcv
 import numpy as np
 from mmcv.utils import print_log
 from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
+#from pycocotools.cocoeval import COCOeval
+from mmdet.datasets.fast_eval_api import COCOeval_opt as COCOeval
 from terminaltables import AsciiTable
 
 from mmdet.core import eval_recalls
@@ -453,15 +454,16 @@ class CocoDataset(CustomDataset):
                 'mAP': 0,
                 'mAP_50': 1,
                 'mAP_75': 2,
-                'mAP_s': 3,
-                'mAP_m': 4,
-                'mAP_l': 5,
-                'AR@100': 6,
-                'AR@300': 7,
-                'AR@1000': 8,
-                'AR_s@1000': 9,
-                'AR_m@1000': 10,
-                'AR_l@1000': 11
+                'mAP_25': 3,
+                'mAP_s': 4,
+                'mAP_m': 5,
+                'mAP_l': 6,
+                'AR@100': 7,
+                'AR@300': 8,
+                'AR@1000': 9,
+                'AR_s@1000': 10,
+                'AR_m@1000': 11,
+                'AR_l@1000': 12
             }
             if metric_items is not None:
                 for metric_item in metric_items:
@@ -524,7 +526,7 @@ class CocoDataset(CustomDataset):
 
                 if metric_items is None:
                     metric_items = [
-                        'mAP', 'mAP_50', 'mAP_75', 'mAP_s', 'mAP_m', 'mAP_l'
+                        'mAP', 'mAP_50', 'mAP_75', 'mAP_25','mAP_s', 'mAP_m', 'mAP_l'
                     ]
 
                 for metric_item in metric_items:
