@@ -1,10 +1,11 @@
 import argparse
 import copy
+import sys
 import os
 import os.path as osp
 import time
 import warnings
-
+import shutil
 import mmcv
 import torch
 from mmcv import Config, DictAction
@@ -102,8 +103,11 @@ def main():
         cfg.work_dir = args.work_dir
     elif cfg.get('work_dir', None) is None:
         # use config filename as default work_dir if cfg.work_dir is None
-        cfg.work_dir = osp.join('./work_dirs',
-                                osp.splitext(osp.basename(args.config))[0])
+        rm_dir=osp.join('./work_dirs',osp.splitext(osp.basename(args.config))[0])
+        cfg.work_dir = rm_dir
+    print(os.getcwd())
+    print(cfg.work_dir)
+    #sys.exit()
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
     if args.gpu_ids is not None:
