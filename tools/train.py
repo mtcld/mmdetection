@@ -105,8 +105,8 @@ def main():
         # use config filename as default work_dir if cfg.work_dir is None
         rm_dir=osp.join('./work_dirs',osp.splitext(osp.basename(args.config))[0])
         cfg.work_dir = rm_dir
-    print(os.getcwd())
-    print(cfg.work_dir)
+    #print(os.getcwd())
+    #print(cfg.work_dir)
     #sys.exit()
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
