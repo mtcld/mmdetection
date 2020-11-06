@@ -110,7 +110,7 @@ data = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=50,
+    interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
         dict(type='TensorboardLoggerHook')
@@ -121,7 +121,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_detector'
+work_dir = './work_dirs/dent_detector_sub'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
