@@ -95,7 +95,7 @@ data = dict(
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'valid_total.json',
+        ann_file=data_root + 'test_total.json',
         img_prefix=data_root + 'images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
