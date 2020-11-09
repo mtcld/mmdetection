@@ -326,7 +326,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         if out_file is not None:
             show = False
         # draw bounding boxes
-        img,bbox,label=mmcv.imshow_det_bboxes(
+        img,bbox,label,scores=mmcv.imshow_det_bboxes(
             img,
             bboxes,
             labels,
@@ -342,4 +342,4 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             out_file=out_file)
 
         if not (show or out_file):
-            return img,bbox,label
+            return img,bbox,label,scores
