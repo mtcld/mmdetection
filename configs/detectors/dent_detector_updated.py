@@ -34,7 +34,7 @@ model = dict(
 
 classes=['dent']
 dataset_type = 'CocoDataset'
-data_root = '/mmdetection/data/dent/'
+data_root = '/mmdetection/data/dent_updated/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 # train_pipeline = [
@@ -81,13 +81,13 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'train_total.json',
+        ann_file=data_root + 'annotations/dent_train.json',
         img_prefix=data_root + 'images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'valid_total.json',
+        ann_file=data_root + 'annotations/dent_valid.json',
         #worflow = [('train', 1), ('val', 1)],
         img_prefix=data_root + 'images/'),
     test=dict(
@@ -95,7 +95,7 @@ data = dict(
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'test_total.json',
+        ann_file=data_root + 'annotations/dent_test.json',
         img_prefix=data_root + 'images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
