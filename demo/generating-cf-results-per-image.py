@@ -67,6 +67,7 @@ checkpoint_file = '../data/dent_mmdet_model/epoch_9.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
+
 Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 
 file_store=damage_name + '_files/'
@@ -82,11 +83,13 @@ category_dict={}
 for i in data['categories']:
     category_dict[i['id']]=i['name']
 
+    
 pathlib.Path(damage_name+'/small/').mkdir(parents=True, exist_ok=True) 
 pathlib.Path(damage_name+'/medium/').mkdir(parents=True, exist_ok=True) 
 pathlib.Path(damage_name+'/large/').mkdir(parents=True, exist_ok=True) 
 pathlib.Path(file_store).mkdir(parents=True, exist_ok=True) 
 pathlib.Path(fp_store).mkdir(parents=True, exist_ok=True) 
+
 
 confusion_matrix={}
 data_out=[]
@@ -97,6 +100,7 @@ TP50=0
 FP=0
 FN=0
 
+
 for cat in category_dict.keys():
     catnew=cat
     print('catnew')
@@ -104,6 +108,9 @@ for cat in category_dict.keys():
     catstr=str(catnew)+'_'
     for i in tqdm(range(len(data['images']))):
         fp_check=0
+        tp_temp=0
+        fp_temp=0
+        fn_temp=0
         if 1>0:
             annt_dict={}
             h=data['images'][i]['height']
@@ -156,6 +163,7 @@ for cat in category_dict.keys():
                     annt_dict['score']=cf
                     annt_dict['size']=-1
                     fp_check=1 
+                    fp_temp=fp_temp+1
                     
                     
             else:
@@ -174,11 +182,16 @@ for cat in category_dict.keys():
                         r_org=org_bbox_dict[org_keys]
                         area=rect_area_intersect(r_org,r_pred)
                         area_dict[org_keys]=area
+                    ann_detected=max(area_dict, key=area_dict.get)
+                    if ann_detected in bbox_detected:
+                        continue
+                        
                     if max(area_dict.values())>0.25:
                         TP25=TP25+1
+                        tp_temp=tp_temp+1
+                        
                         status='TP'
                         IOU_25=1
-                        ann_detected=max(area_dict, key=area_dict.get)
                         bbox_detected.append(ann_detected)
                         
                         r_org=org_bbox_dict[ann_detected]
@@ -200,6 +213,7 @@ for cat in category_dict.keys():
                         
                     else:
                         FP=FP+1
+                        fp_temp=fp_temp+1
                         status='FP'
                         fp_check=1
                         IOU_25=0
@@ -217,6 +231,7 @@ for cat in category_dict.keys():
                 if ann in bbox_detected:
                     continue
                 FN=FN+1
+                fn_temp=fn_temp+1
                 r_org=org_bbox_dict[ann]
                 size=size_check_ann(r_org)
             
@@ -227,18 +242,21 @@ for cat in category_dict.keys():
             annt_dict['annotated_poly']=p_org
             annt_dict['predicted_poly']=p_pred
             annt_dict['fp_check']=fp_check
+            annt_dict['tp']=tp_temp
+            annt_dict['fp']=fp_temp
+            annt_dict['fn']=fn_temp
             print(annt_dict)
             
             
-            data_out.append(annt_dict)
+            data_out.append(annt_dict.copy())
 
-   
+         
 confusion_matrix={'true_positve_25':TP25,'true_positve_50':TP50,'false_positive':FP, 'false_negative':FN}
 with open(damage_name+'_confusion_matrix.json', 'w') as outfile:
         json.dump(confusion_matrix,outfile,indent=4,ensure_ascii = False)
 
 csv_file = "_data_out.csv"
-csv_columns = ['image_name','image_id','annotated_poly','predicted_poly','fp_check']
+csv_columns = ['image_name','image_id','annotated_poly','predicted_poly','fp_check','tp','fp','fn']
 try:
     with open(damage_name+csv_file, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
@@ -247,3 +265,4 @@ try:
             writer.writerow(data)
 except IOError:
     print("I/O error")
+    
