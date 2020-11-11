@@ -343,8 +343,10 @@ class LoadAnnotations(object):
         if self.file_client is None:
             self.file_client = mmcv.FileClient(**self.file_client_args)
 
+        #print('7'*300)
+        #print(results)
         filename = osp.join(results['seg_prefix'],
-                            results['ann_info']['seg_map'])
+                            results['ann_info']['seg_map'][0:results['ann_info']['seg_map'].rfind('.')]+'.png')
         img_bytes = self.file_client.get(filename)
         results['gt_semantic_seg'] = mmcv.imfrombytes(
             img_bytes, flag='unchanged').squeeze()

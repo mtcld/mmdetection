@@ -51,6 +51,11 @@ test_pipeline = [
 data = dict(
     train=dict(
         seg_prefix=data_root+'dent_updated_mask',
+        img_prefix=data_root + 'dent_updated/images/',
         pipeline=train_pipeline),
-    val=dict(pipeline=test_pipeline),
-    test=dict(pipeline=test_pipeline))
+    val=dict(
+        pipeline=test_pipeline,
+        img_prefix=data_root + 'dent_updated/images/'),
+    test=dict(
+        pipeline=test_pipeline,
+        img_prefix=data_root + 'dent_updated/images/'))

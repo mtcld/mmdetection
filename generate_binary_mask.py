@@ -6,7 +6,8 @@ from tqdm import tqdm
 
 damage_name='dent_updated'
 image_dir='data/'+damage_name+'/images/'
-pathlib.Path().mkdir(parents=True, exist_ok=True) 
+mask_dir='data/'+damage_name+'_mask'
+pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True) 
 modes=['test','train','valid']
 
 for mode in modes:    
