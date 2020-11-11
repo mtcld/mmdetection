@@ -167,8 +167,8 @@ class CocoDataset(CustomDataset):
             gt_bboxes_ignore = np.zeros((0, 4), dtype=np.float32)
 
         seg_map = img_info['filename'].replace('jpg', 'png')
-        print('---'*100)
-        print(img_info)
+        #print('---'*100)
+        #print(img_info)
         ann = dict(
             bboxes=gt_bboxes,
             labels=gt_labels,
