@@ -297,9 +297,13 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         img = mmcv.imread(img)
         img = img.copy()
         if isinstance(result, tuple):
+            print('yes')
             bbox_result, segm_result = result
+            print(segm_result)
+            print(len(bbox_result),len(segm_result))
             if isinstance(segm_result, tuple):
                 segm_result = segm_result[0]  # ms rcnn
+                print(segm_result)
         else:
             bbox_result, segm_result = result, None
         bboxes = np.vstack(bbox_result)
@@ -308,6 +312,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             for i, bbox in enumerate(bbox_result)
         ]
         labels = np.concatenate(labels)
+        print(len(bboxes))
         # draw segmentation masks
         if segm_result is not None and len(labels) > 0:  # non empty
             segms = mmcv.concat_list(segm_result)
@@ -322,6 +327,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 color_mask = color_masks[labels[i]]
                 mask = segms[i].astype(bool)
                 img[mask] = img[mask] * 0.5 + color_mask * 0.5
+        print(len(segms))
         # if out_file specified, do not show image in window
         if out_file is not None:
             show = False
@@ -329,6 +335,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         img,bbox,label,scores=mmcv.imshow_det_bboxes(
             img,
             bboxes,
+            segms,
             labels,
             class_names=self.CLASSES,
             score_thr=score_thr,

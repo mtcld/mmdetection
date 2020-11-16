@@ -63,7 +63,7 @@ damage_name='dent'
 
 config_file = '../configs/detectors/dent_detector.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/dent_mmdet_model/epoch_9.pth'
+checkpoint_file = '../data/disk1/dent_mmdet_model/epoch_9.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/dent/test_total.json'
-img_dir='/mmdetection/data/dent/images/'
+test_json='/mmdetection/data/disk1/dent/test_total.json'
+img_dir='/mmdetection/data/dent/disk1/images/'
 
 with open(test_json) as f:
     data = json.load(f)
