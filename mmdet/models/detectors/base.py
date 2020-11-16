@@ -307,6 +307,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         else:
             bbox_result, segm_result = result, None
         bboxes = np.vstack(bbox_result)
+        #segmes=np.vstack(segm_result)
         labels = [
             np.full(bbox.shape[0], i, dtype=np.int32)
             for i, bbox in enumerate(bbox_result)
@@ -332,7 +333,7 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         if out_file is not None:
             show = False
         # draw bounding boxes
-        img,bbox,label,scores=mmcv.imshow_det_bboxes(
+        img,bbox,segm,label,scores=mmcv.imshow_det_bboxes(
             img,
             bboxes,
             segms,
@@ -349,4 +350,4 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             out_file=out_file)
 
         if not (show or out_file):
-            return img,bbox,label,scores
+            return img,bbox,segm,label,scores
