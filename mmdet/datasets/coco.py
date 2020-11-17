@@ -407,7 +407,7 @@ class CocoDataset(CustomDataset):
                 raise KeyError(f'metric {metric} is not supported')
         if iou_thrs is None:
             iou_thrs = np.linspace(
-                .25, 0.95, int(np.round((0.95 - .25) / .05)) + 1, endpoint=True)
+                .10, 0.95, int(np.round((0.95 - .25) / .05)) + 1, endpoint=True)
         if metric_items is not None:
             if not isinstance(metric_items, list):
                 metric_items = [metric_items]
@@ -456,15 +456,16 @@ class CocoDataset(CustomDataset):
                 'mAP_50': 1,
                 'mAP_75': 2,
                 'mAP_25': 3,
-                'mAP_s': 4,
-                'mAP_m': 5,
-                'mAP_l': 6,
-                'AR@100': 7,
-                'AR@300': 8,
-                'AR@1000': 9,
-                'AR_s@1000': 10,
-                'AR_m@1000': 11,
-                'AR_l@1000': 12
+                'map_10':4,
+                'mAP_s': 5,
+                'mAP_m': 6,
+                'mAP_l': 7,
+                'AR@100': 8,
+                'AR@300': 9,
+                'AR@1000': 10,
+                'AR_s@1000': 11,
+                'AR_m@1000': 12,
+                'AR_l@1000': 13
             }
             if metric_items is not None:
                 for metric_item in metric_items:
@@ -527,7 +528,7 @@ class CocoDataset(CustomDataset):
 
                 if metric_items is None:
                     metric_items = [
-                        'mAP', 'mAP_50', 'mAP_75', 'mAP_25','mAP_s', 'mAP_m', 'mAP_l'
+                        'mAP', 'mAP_50', 'mAP_75', 'mAP_25','map_10','mAP_s', 'mAP_m', 'mAP_l'
                     ]
 
                 for metric_item in metric_items:
