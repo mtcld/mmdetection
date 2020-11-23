@@ -407,7 +407,8 @@ class CocoDataset(CustomDataset):
                 raise KeyError(f'metric {metric} is not supported')
         if iou_thrs is None:
             iou_thrs = np.linspace(
-                .05, 0.95, int(np.round((0.95 - .05) / .05)) + 1, endpoint=True)
+                .10, 0.95, int(np.round((0.95 - .10) / .05)) + 1, endpoint=True)
+        print(iou_thrs)
         if metric_items is not None:
             if not isinstance(metric_items, list):
                 metric_items = [metric_items]
