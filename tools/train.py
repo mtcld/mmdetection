@@ -179,6 +179,7 @@ def main():
         validate=(not args.no_validate),
         timestamp=timestamp,
         meta=meta)
+    print('Training completed')
 
 
 if __name__ == '__main__':
