@@ -6,9 +6,9 @@ _base_ = [
 
 
 
-classes=['dent']
+classes=['scratch']
 dataset_type = 'CocoDataset'
-data_root = '/mmdetection/data/dent/'
+data_root = '/mmdetection/data/scratch/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -55,13 +55,13 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'train_total.json',
+        ann_file=data_root + 'annotations/scratch_train.json',
         img_prefix=data_root + 'images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'valid_total.json',
+        ann_file=data_root + 'annotations/scratch_valid.json',
         #worflow = [('train', 1), ('val', 1)],
         img_prefix=data_root + 'images/'),
     test=dict(
@@ -69,7 +69,7 @@ data = dict(
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'test_total.json',
+        ann_file=data_root + 'annotations/scratch_test.json',
         img_prefix=data_root + 'images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -95,7 +95,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_maskrcnn'
+work_dir = './work_dirs/scratch_maskrcnn'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
