@@ -22,6 +22,14 @@ from mmdet.utils import collect_env, get_root_logger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
+    parser.add_argument(
+        '--lr', default=0.02, 
+        type=float, 
+        help='Learning rate parameter')
+    parser.add_argument('--MOMENTUM',  # Specified in the config file
+        type=float,
+        default=0.9,
+        help='SGD momentum (default: 0.5)')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
@@ -85,6 +93,8 @@ def main():
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
+    cfg['optimizer']['lr']=args.config
+    cfg['optimizer']['momentum']=args.MOMENTUM
     config_name=args.config
     config_name=config_name[config_name.rfind('/')+1:config_name.rfind('.')]
     print(config_name)
