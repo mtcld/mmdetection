@@ -84,6 +84,9 @@ def main():
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
+    print(type(cfg))
+    print(cfg.keys())
+    print(cfg['dataset_type'])
     print('#'*100)
     print(cfg)
     print('#'*100)
