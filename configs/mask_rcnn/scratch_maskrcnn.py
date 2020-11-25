@@ -8,7 +8,7 @@ _base_ = [
 
 classes=['scratch']
 dataset_type = 'CocoDataset'
-data_root = '/mmdetection/data/scratch/'
+data_root = '/mmdetection/data/disk1/scratch_latest/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
