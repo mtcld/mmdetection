@@ -4,6 +4,7 @@ import sys
 import os
 import os.path as osp
 import time
+import hypertune
 import json
 import warnings
 import shutil
@@ -197,8 +198,18 @@ def main():
     
     with open('final_epoch.json') as f:
         epoch_data=json.load(f)
-    model_path='work_dirs/'+config_name+'/'+epoch_data['epoch']
+    with open('map_data.json') as f:
+        map_data=json.load(f)
+    for md in map_data['map']:
+        if md['epoch'] == int(epoch_data['epoch']):
+            map_25=md['bbox_mAP_25']
+
+    model_path='work_dirs/'+config_name+'/epoch_'+str(epoch_data['epoch'])+'.pth'
     print(model_path)
+
+    hpt = hypertune.HyperTune()
+    hpt.report_hyperparameter_tuning_metric(hyperparameter_metric_tag='map25', metric_value=map_25,
+                                            global_step=1)
 
 if __name__ == '__main__':
     main()
