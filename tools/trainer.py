@@ -91,6 +91,11 @@ def parse_args():
 
 
 def main():
+    os.system('gsutil cp gs://hptuning2/scratch_latest.zip .')
+    os.system('gsutil cp gs://hptuning2/scratch_latest_mask.zip .')
+    os.system('unzip scratch_latest_mask.zip')
+    os.system('unzip scratch_latest.zip')
+
     args = parse_args()
 
     cfg = Config.fromfile(args.config)
