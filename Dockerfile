@@ -12,6 +12,17 @@ RUN apt-get update && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build 
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+#
+COPY credentials.json /etc/
+ENV GOOGLE_APPLICATION_CREDENTIALS="/etc/credentials.json"
+RUN gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+
+RUN wget https://bootstrap.pypa.io/get-pip.py && \
+	python3 get-pip.py
+
+RUN pip install tensorboard future
+
+
 # Install MMCV
 #RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://openmmlab.oss-accelerate.aliyuncs.com/mmcv/dist/index.html
 RUN git clone https://github.com/gaurav67890/mmcv.git
