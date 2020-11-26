@@ -17,7 +17,7 @@ RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://openmmlab.oss-acce
 
 # Install MMDetection
 RUN conda clean --all
-RUN git clone https://github.com/open-mmlab/mmdetection.git /mmdetection
+RUN git clone https://github.com/gaurav67890/mmdetection.git /mmdetection
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt
