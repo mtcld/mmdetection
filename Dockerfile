@@ -42,7 +42,7 @@ RUN cd mmcv && MMCV_WITH_OPS=1 pip install -e . && cd ..
 
 # Install MMDetection
 RUN conda clean --all
-RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection && cd /mmdetection
+RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection /mmdetection
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt
