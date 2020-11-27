@@ -31,6 +31,11 @@ def parse_args():
         type=float,
         default=0.9,
         help='SGD momentum (default: 0.5)')
+    parser.add_argument(
+        '--job-dir',  # Handled automatically by AI Platform
+        help='GCS location to write checkpoints and export models'
+        #required=True
+        )
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(
