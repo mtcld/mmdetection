@@ -42,10 +42,10 @@ RUN cd mmcv && MMCV_WITH_OPS=1 pip install -e . && cd ..
 
 # Install MMDetection
 RUN conda clean --all
-RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection /mmdetection
+RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection && cd /mmdetection
 WORKDIR /mmdetection
 ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt
 RUN pip install --no-cache-dir -e .
 
-ENTRYPOINT ['./tools/dist_train.sh,configs/mask-rcnn/dent_maskrcnn.py,4']
+ENTRYPOINT ['./tools/dist_train.sh,configs/detectors/scratch_detector_latest_segm.py,4']
