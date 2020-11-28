@@ -20,6 +20,7 @@ from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import collect_env, get_root_logger
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/etc/credentials.json"
+print('Started')
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
