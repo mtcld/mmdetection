@@ -13,7 +13,7 @@ import torch
 from mmcv import Config, DictAction
 from mmcv.runner import init_dist
 from mmcv.utils import get_git_hash
-
+from google.cloud import storage
 from mmdet import __version__
 from mmdet.apis import set_random_seed, train_detector
 from mmdet.datasets import build_dataset
@@ -24,6 +24,11 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/etc/credentials.json"
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument(
+        '--job-dir',  # Handled automatically by AI Platform
+        help='GCS location to write checkpoints and export models'
+        #required=True
+        )
+    parser.add_argument(
         '--lr', default=0.02, 
         type=float, 
         help='Learning rate parameter')
@@ -31,11 +36,11 @@ def parse_args():
         type=float,
         default=0.9,
         help='SGD momentum (default: 0.5)')
-    parser.add_argument(
-        '--job-dir',  # Handled automatically by AI Platform
-        help='GCS location to write checkpoints and export models'
-        #required=True
-        )
+#    parser.add_argument(
+#        '--job-dir',  # Handled automatically by AI Platform
+#        help='GCS location to write checkpoints and export models'
+#        #required=True
+#        )
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument(

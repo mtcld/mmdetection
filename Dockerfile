@@ -33,7 +33,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
 	python3 get-pip.py
 
 RUN pip install tensorboard future
-
+RUN pip install pandas google-cloud-storage cloudml-hypertune
 
 # Install MMCV
 #RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://openmmlab.oss-accelerate.aliyuncs.com/mmcv/dist/index.html
