@@ -112,8 +112,9 @@ def main():
     #job_dir = args.pop('job_dir')
 
     cfg = Config.fromfile(args.config)
-    cfg['optimizer']['lr']=args.config
-    cfg['optimizer']['momentum']=args.MOMENTUM
+    print(args.config)
+    cfg['optimizer']['lr']=float(args.config)
+    cfg['optimizer']['momentum']=float(args.MOMENTUM)
     config_name=args.config
     config_name=config_name[config_name.rfind('/')+1:config_name.rfind('.')]
     print(config_name)
