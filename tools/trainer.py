@@ -108,7 +108,7 @@ def main():
     os.system('unzip scratch_latest.zip')
 
     args = parse_args()
-    job_dir = args.pop('job_dir')
+    #job_dir = args.pop('job_dir')
 
     cfg = Config.fromfile(args.config)
     cfg['optimizer']['lr']=args.config
