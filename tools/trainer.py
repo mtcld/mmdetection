@@ -114,7 +114,7 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg)
     print(args.config)
-    cfg['optimizer']['lr']=float(args.config)
+    cfg['optimizer']['lr']=float(args.lr)
     cfg['optimizer']['momentum']=float(args.MOMENTUM)
     config_name=args.config
     config_name=config_name[config_name.rfind('/')+1:config_name.rfind('.')]
