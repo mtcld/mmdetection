@@ -59,11 +59,11 @@ def size_check_ann(r_org):
     return size
 
 
-damage_name='dent'
+damage_name='scratch'
 
-config_file = '../configs/detectors/dent_detector.py'
+config_file = '../configs/mask_rcnn/scratch_maskrcnn.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/disk1/dent_mmdet_model/epoch_9.pth'
+checkpoint_file = '../data/disk1/scratch_mmdet_maskrcnn_model/epoch_13.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/disk1/dent/test_total.json'
-img_dir='/mmdetection/data/dent/disk1/images/'
+test_json='/mmdetection/data/disk1/scratch_latest/annotations/scratch_test.json'
+img_dir='/mmdetection/data/disk1/scratch_latest/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -141,8 +141,8 @@ for cat in category_dict.keys():
             out=show_result_pyplot(model, img, result)
             print(out)
             bbox_pred=out[1]
-            classes_pred=out[2] 
-            scores_pred=out[3]
+            classes_pred=out[3] 
+            scores_pred=out[4]
 
             area_list=[]
             bbox_detected=[]
@@ -196,7 +196,7 @@ for cat in category_dict.keys():
                         
                         r_org=org_bbox_dict[ann_detected]
                         
-                        size=size_check_ann(r_org)
+                        #size=size_check_ann(r_org)
                         
                         cv2.rectangle(image_new_org,(r_pred.xmin,r_pred.ymin),(r_pred.xmax,r_pred.ymax),(255,0,0),2)
                         
@@ -233,7 +233,7 @@ for cat in category_dict.keys():
                 FN=FN+1
                 fn_temp=fn_temp+1
                 r_org=org_bbox_dict[ann]
-                size=size_check_ann(r_org)
+                #size=size_check_ann(r_org)
             
             if fp_check==1:
                 cv2.imwrite(fp_store+file_name,image_new_org)
