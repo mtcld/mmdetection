@@ -110,8 +110,9 @@ def main():
 
     args = parse_args()
     #job_dir = args.pop('job_dir')
-
+    print('args '*100)
     cfg = Config.fromfile(args.config)
+    print(cfg)
     print(args.config)
     cfg['optimizer']['lr']=float(args.config)
     cfg['optimizer']['momentum']=float(args.MOMENTUM)
