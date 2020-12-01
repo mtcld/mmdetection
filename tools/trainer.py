@@ -107,7 +107,7 @@ def main():
     os.system('gsutil cp gs://hptuning2/scratch_latest_mask.zip .')
     os.system('unzip scratch_latest_mask.zip')
     os.system('unzip scratch_latest.zip')
-
+    print('point a')
     args = parse_args()
     #job_dir = args.pop('job_dir')
     print('args '*100)
