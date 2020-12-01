@@ -103,10 +103,10 @@ def parse_args():
 
 def main():
     print('started')
-    os.system('gsutil cp gs://hptuning2/scratch_latest.zip .')
-    os.system('gsutil cp gs://hptuning2/scratch_latest_mask.zip .')
-    os.system('unzip scratch_latest_mask.zip')
-    os.system('unzip scratch_latest.zip')
+    #os.system('gsutil cp gs://hptuning2/scratch_latest.zip .')
+    #os.system('gsutil cp gs://hptuning2/scratch_latest_mask.zip .')
+    #os.system('unzip scratch_latest_mask.zip')
+    #os.system('unzip scratch_latest.zip')
 
     print('point a')
     args = parse_args()
