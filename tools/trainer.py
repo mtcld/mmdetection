@@ -225,7 +225,7 @@ def main():
         if md['epoch'] == int(epoch_data['epoch']):
             map_25=md['bbox_mAP_25']
 
-    model_path='work_dirs/'+config_name+'/epoch_'+str(epoch_data['epoch'])+'.pth'
+    model_path='/mmdetection/work_dirs/'+config_name+'/epoch_'+str(epoch_data['epoch'])+'.pth'
     print(model_path)
 
     hpt = hypertune.HyperTune()
