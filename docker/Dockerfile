@@ -50,4 +50,4 @@ ENV FORCE_CUDA="1"
 RUN pip install -r requirements/build.txt
 RUN pip install --no-cache-dir -e .
 
-ENTRYPOINT ["python","tools/trainer.py","configs/detectors/scratch_detector_latest_segm.py"]
+#ENTRYPOINT ["python","tools/trainer.py","configs/detectors/scratch_detector_latest_segm.py"]
