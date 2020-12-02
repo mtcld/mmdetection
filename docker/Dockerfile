@@ -37,12 +37,14 @@ RUN pip install pandas google-cloud-storage cloudml-hypertune
 
 # Install MMCV
 #RUN pip install mmcv-full==latest+torch1.6.0+cu101 -f https://openmmlab.oss-accelerate.aliyuncs.com/mmcv/dist/index.html
-RUN git clone https://github.com/gaurav67890/mmcv.git
-RUN cd mmcv && MMCV_WITH_OPS=1 pip install -e . && cd ..
+#RUN git clone https://github.com/gaurav67890/mmcv.git
+#RUN cd mmcv && MMCV_WITH_OPS=1 pip install -e . && cd ..
 
 # Install MMDetection
 RUN conda clean --all
 RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection /mmdetection
+RUN git clone https://github.com/gaurav67890/mmcv.git
+RUN cd mmcv && MMCV_WITH_OPS=1 pip install -e . && cd ..
 COPY scratch_latest /mmdetection/scratch_latest
 COPY scratch_latest_mask /mmdetection/scratch_latest_mask
 WORKDIR /mmdetection
