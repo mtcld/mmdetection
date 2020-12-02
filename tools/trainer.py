@@ -100,6 +100,28 @@ def parse_args():
 
     return args
 
+def save_model(job_dir, model_name):
+    """Saves the model to Google Cloud Storage"""
+    job_dir = job_dir.replace('gs://', '')  
+    bucket_id = job_dir.split('/')[0]
+    bucket_path = job_dir.lstrip('{}/'.format(bucket_id))
+    #plot_names=glob.glob('./*.png')
+    #plot_names.extend([model_name,dice_dict_name])
+    all_files=[model_name]
+    for f in all_files:
+        bucket = storage.Client().bucket(bucket_id)
+        if f==model_name:
+            blob = bucket.blob('{}/{}'.format(
+                bucket_path,
+                f[f.rfind('/')+1:]))
+        else:
+            blob= bucket.blob('{}/{}'.format(
+                bucket_path,
+                f))
+        blob.upload_from_filename(f)
+
+
+
 
 def main():
     print('started')
