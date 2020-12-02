@@ -249,10 +249,12 @@ def main():
 
     model_path='/mmdetection/work_dirs/'+config_name+'/epoch_'+str(epoch_data['epoch'])+'.pth'
     print(model_path)
-
+    
     hpt = hypertune.HyperTune()
     hpt.report_hyperparameter_tuning_metric(hyperparameter_metric_tag='map25', metric_value=map_25,
                                             global_step=1)
+
+   save_model(args.job_dir,model_path)
 
 if __name__ == '__main__':
     main()
