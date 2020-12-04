@@ -42,7 +42,7 @@ RUN pip install pandas google-cloud-storage cloudml-hypertune
 
 # Install MMDetection
 RUN conda clean --all
-RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection /mmdetection
+RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-663-gcp-tuning-mmdetection-sub /mmdetection
 RUN cd /mmdetection
 ENV FORCE_CUDA="1"
 RUN git clone https://github.com/gaurav67890/mmcv.git /mmcv
