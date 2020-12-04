@@ -57,5 +57,5 @@ RUN pip install -r requirements/build.txt
 RUN pip install --no-cache-dir -e .
 
 #ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/dent_sub.py","2"]
-ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/dent_detector_sub.py","4"]
+#ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/dent_detector_sub.py","4"]
 
