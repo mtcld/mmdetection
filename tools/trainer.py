@@ -37,6 +37,15 @@ def parse_args():
         type=float,
         default=0.9,
         help='SGD momentum (default: 0.5)')
+    parser.add_argument(
+        '--INIT_STEP', default=8, 
+        type=int, 
+        help='initial step')
+    parser.add_argument(
+        '--STEP_RANGE', default=3, 
+        type=int, 
+        help='step range')
+
 #    parser.add_argument(
 #        '--job-dir',  # Handled automatically by AI Platform
 #        help='GCS location to write checkpoints and export models'
@@ -139,6 +148,7 @@ def main():
     print(args.config)
     cfg['optimizer']['lr']=float(args.lr)
     cfg['optimizer']['momentum']=float(args.MOMENTUM)
+    cfg['lr_config']['step']=[args.INIT_STEP,args.INIT_STEP+args.STEP_RANGE]
     config_name=args.config
     config_name=config_name[config_name.rfind('/')+1:config_name.rfind('.')]
     print(config_name)

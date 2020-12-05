@@ -19,3 +19,17 @@ trainingInput:
         minValue: 0.4
         maxValue: 0.95
         scaleType: UNIT_LINEAR_SCALE
+
+      - parameterName: INIT_STEP
+        type: INTEGER
+        minValue: 6
+        maxValue: 12
+        scaleType: UNIT_LINEAR_SCALE
+
+      - parameterName: STEP_RANGE   
+        type: INTEGER
+        minValue: 3
+        maxValue: 6
+        scaleType: UNIT_LINEAR_SCALE
+
+
