@@ -245,6 +245,7 @@ class CocoDataset(CustomDataset):
                     data['image_id'] = img_id
                     data['bbox'] = self.xyxy2xywh(bboxes[i])
                     data['score'] = float(bboxes[i][4])
+                    label=0
                     data['category_id'] = self.cat_ids[label]
                     bbox_json_results.append(data)
 
