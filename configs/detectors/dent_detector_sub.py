@@ -1,8 +1,4 @@
-_base_ = [
-    '../_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/coco_detection.py',
-    '../_base_/schedules/schedule_1x.py', '../_base_/default_runtime.py'
-]
+_base_ = '../htc/htc_r50_fpn_1x_coco.py'
 
 model = dict(
     backbone=dict(
@@ -97,6 +93,7 @@ data = dict(
         #worflow = [('train', 1), ('val', 1)],
         ann_file=data_root + 'test_total_sub.json',
         img_prefix=data_root + 'images/'))
+
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 # optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
@@ -110,7 +107,7 @@ data = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=10,
+    interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
         dict(type='TensorboardLoggerHook')
