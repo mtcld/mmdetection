@@ -142,8 +142,8 @@ for cat in category_dict.keys():
             out=show_result_pyplot(model, img, result)
             print(out)
             bbox_pred=out[1]
-            classes_pred=out[2] 
-            scores_pred=out[3]
+            classes_pred=out[3] 
+            scores_pred=out[4]
 
             area_list=[]
             bbox_detected=[]
@@ -197,7 +197,7 @@ for cat in category_dict.keys():
                         
                         r_org=org_bbox_dict[ann_detected]
                         
-                        size=size_check_ann(r_org)
+                        #size=size_check_ann(r_org)
                         
                         cv2.rectangle(image_new_org,(r_pred.xmin,r_pred.ymin),(r_pred.xmax,r_pred.ymax),(255,0,0),2)
                         
@@ -234,7 +234,7 @@ for cat in category_dict.keys():
                 FN=FN+1
                 fn_temp=fn_temp+1
                 r_org=org_bbox_dict[ann]
-                size=size_check_ann(r_org)
+                #size=size_check_ann(r_org)
             
             if fp_check==1:
                 cv2.imwrite(fp_store+file_name,image_new_org)
