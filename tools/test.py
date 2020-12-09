@@ -110,6 +110,15 @@ def main():
         raise ValueError('The output file must be a pkl file.')
 
     cfg = Config.fromfile(args.config)
+    cfg['data']['samples_per_gpu']=1
+    cfg['optimizer']['lr']=0.011
+    cfg['optimizer']['momentum']=0.675
+    cfg['lr_config']['step']=[9,14]
+    cfg['data']['imgs_per_gpu']=1
+    #cfg['data']['workers_per_gpu']=1
+
+    print('#'*300)
+    print(cfg)
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.

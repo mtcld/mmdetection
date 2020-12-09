@@ -30,7 +30,7 @@ model = dict(
 
 classes=['scratch']
 dataset_type = 'CocoDataset'
-data_root = '/mmdetection/'
+data_root = '/mmdetection/data/disk1/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 # train_pipeline = [
@@ -91,7 +91,7 @@ data = dict(
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'scratch_latest/annotations/scratch_test.json',
+        ann_file=data_root + 'scratch_latest/annotations/scratch_test_new.json',
         img_prefix=data_root + 'scratch_latest/images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)

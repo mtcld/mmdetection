@@ -60,6 +60,7 @@ class CocoDataset(CustomDataset):
         data_infos = []
         for i in self.img_ids:
             info = self.coco.load_imgs([i])[0]
+            #print(info['file_name'])
             info['filename'] = info['file_name']
             data_infos.append(info)
         return data_infos

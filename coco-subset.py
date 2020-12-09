@@ -12,7 +12,10 @@ new_data['info']=data['info']
 new_data['licences']=data['licences']
 new_data['categories']=data['categories']
 
-images_subset=data['images'][:50]
+first_half=int(0.5*len(data['images']))
+images_subset=data['images'][:first_half]
+#images_subset=data['images'][first_half:len(data['images'])]
+
 images_subset_id=[]
 for i in images_subset:
     images_subset_id.append(i['id'])

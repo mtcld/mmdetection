@@ -62,6 +62,7 @@ class LoadImage(object):
             dict: ``results`` will be returned containing loaded image.
         """
         if isinstance(results['img'], str):
+            print(results['filename'])
             results['filename'] = results['img']
             results['ori_filename'] = results['img']
         else:
