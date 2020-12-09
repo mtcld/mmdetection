@@ -4,7 +4,7 @@ trainingInput:
   hyperparameters: 
     goal: MAXIMIZE
     maxTrials: 100
-    maxParallelTrials: 4
+    maxParallelTrials: 1
     hyperparameterMetricTag: map25
     enableTrialEarlyStopping: True
     params:
