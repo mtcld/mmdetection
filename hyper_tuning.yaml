@@ -4,14 +4,14 @@ trainingInput:
   hyperparameters: 
     goal: MAXIMIZE
     maxTrials: 100
-    maxParallelTrials: 1
+    maxParallelTrials: 4
     hyperparameterMetricTag: map25
     enableTrialEarlyStopping: True
     params:
       - parameterName: lr
         type: DOUBLE
-        minValue: 0.002
-        maxValue: 0.02
+        minValue: 0.001
+        maxValue: 0.01
         scaleType: UNIT_LINEAR_SCALE
 
       - parameterName: MOMENTUM
@@ -22,7 +22,7 @@ trainingInput:
 
       - parameterName: INIT_STEP
         type: INTEGER
-        minValue: 6
+        minValue: 7
         maxValue: 12
         scaleType: UNIT_LINEAR_SCALE
 
