@@ -59,11 +59,11 @@ def size_check_ann(r_org):
     return size
 
 
-damage_name='scratch'
+damage_name='scratch_latest'
 
 config_file = '../configs/detectors/scratch_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/disk1/scratch_mmdet_gcp_model/epoch_11.pth'
+checkpoint_file = '../data/disk1/scratch_mmdet_gcp_model3/epoch_14.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 

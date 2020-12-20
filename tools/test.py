@@ -111,9 +111,9 @@ def main():
 
     cfg = Config.fromfile(args.config)
     cfg['data']['samples_per_gpu']=1
-    cfg['optimizer']['lr']=0.011
-    cfg['optimizer']['momentum']=0.675
-    cfg['lr_config']['step']=[9,14]
+    cfg['optimizer']['lr']=0.00376
+    cfg['optimizer']['momentum']=0.94311
+    cfg['lr_config']['step']=[12,6]
     cfg['data']['imgs_per_gpu']=1
     #cfg['data']['workers_per_gpu']=1
 
