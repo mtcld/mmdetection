@@ -45,6 +45,34 @@ def parse_args():
         '--STEP_RANGE', default=3, 
         type=int, 
         help='step range')
+    parser.add_argument(
+        '--PRE_NMS_TOP_N_TRAIN', default=2000, 
+        type=int, 
+        help='PRE_NMS_TOP_N_TRAIN')
+    parser.add_argument(
+        '--PRE_NMS_TOP_N_TEST', default=1000, 
+        type=int, 
+        help='PRE_NMS_TOP_N_TEST')
+    parser.add_argument(
+        '--POST_NMS_TOP_N_TRAIN', default=2000, 
+        type=int, 
+        help='POST_NMS_TOP_N_TRAIN')
+    parser.add_argument(
+        '--POST_NMS_TOP_N_TEST', default=1000, 
+        type=int, 
+        help='POST_NMS_TOP_N_TEST')
+    parser.add_argument(
+        '--NMS_THRESH_TRAIN', default=0.7, 
+        type=float, 
+        help='NMS_THRESH_TRAIN')
+    parser.add_argument(
+        '--NMS_THRESH_TEST', default=0.7, 
+        type=float, 
+        help='NMS_THRESH_TEST')
+    parser.add_argument(
+        '--POS_FRACTION_RPN', default=0.7, 
+        type=float, 
+        help='POS_FRACTION_RPN')
 
 #    parser.add_argument(
 #        '--job-dir',  # Handled automatically by AI Platform
