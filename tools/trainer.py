@@ -178,10 +178,10 @@ def main():
     cfg['optimizer']['momentum']=float(args.MOMENTUM)
     cfg['lr_config']['step']=[args.INIT_STEP,args.INIT_STEP+args.STEP_RANGE]
     cfg['train_cfg']['rpn_proposal']['nms_pre']=args.PRE_NMS_TOP_N_TRAIN
-    cfg['test_cfg']['rpn_proposal']['nms_pre']=args.PRE_NMS_TOP_N_TEST
+    cfg['test_cfg']['rpn']['nms_pre']=args.PRE_NMS_TOP_N_TEST
     cfg['train_cfg']['rpn_proposal']['nms_post']=args.POST_NMS_TOP_N_TRAIN
-    cfg['test_cfg']['rpn_proposal']['nms_post']=args.POST_NMS_TOP_N_TEST
-    cfg['train_cfg']['rpn']['nms_thr']=args.NMS_THRESH_TRAIN
+    cfg['test_cfg']['rpn']['nms_post']=args.POST_NMS_TOP_N_TEST
+    cfg['train_cfg']['rpn_proposal']['nms_thr']=args.NMS_THRESH_TRAIN
     cfg['test_cfg']['rpn']['nms_thr']=args.NMS_THRESH_TEST
     cfg['train_cfg']['rpn']['sampler']['pos_fraction']=args.POS_FRACTION_RPN
 
