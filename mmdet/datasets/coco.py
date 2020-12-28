@@ -250,6 +250,8 @@ class CocoDataset(CustomDataset):
                     #print(self.cat_ids[label])
                     label=0
                     data['category_id'] = self.cat_ids[0]
+                    label=0
+                    data['category_id'] = self.cat_ids[label]
                     bbox_json_results.append(data)
 
                 # segm results

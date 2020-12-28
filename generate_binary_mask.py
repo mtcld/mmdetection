@@ -11,7 +11,7 @@ pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True)
 modes=['test','train','valid']
 
 for mode in modes:    
-    p1=damage_name+'/annotations/'+mode+'_total_sub.json'
+    p1=damage_name+'/'+mode+'_total_sub.json'
     
     with open(p1) as f:
         data=json.load(f)
