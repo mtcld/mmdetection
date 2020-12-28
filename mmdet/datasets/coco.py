@@ -245,7 +245,11 @@ class CocoDataset(CustomDataset):
                     data['image_id'] = img_id
                     data['bbox'] = self.xyxy2xywh(bboxes[i])
                     data['score'] = float(bboxes[i][4])
-                    data['category_id'] = self.cat_ids[label]
+                    #print('#'*100)
+                    #print(label)
+                    #print(self.cat_ids[label])
+                    label=0
+                    data['category_id'] = self.cat_ids[0]
                     bbox_json_results.append(data)
 
                 # segm results

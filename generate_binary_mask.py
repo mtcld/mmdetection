@@ -4,7 +4,7 @@ import numpy as np
 import pathlib
 from tqdm import tqdm
 
-damage_name='dent_sub'
+damage_name='crack_latest'
 image_dir=damage_name+'/images/'
 mask_dir=damage_name+'_mask'
 pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True) 
