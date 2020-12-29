@@ -42,13 +42,13 @@ RUN pip install pandas google-cloud-storage cloudml-hypertune
 
 # Install MMDetection
 RUN conda clean --all
-RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-709-gcp-tuning-mmdetection-crack /mmdetection
+RUN git clone https://github.com/gaurav67890/mmdetection.git -b feat/AICAR-712-gcp-tuning-mmdetection-dent /mmdetection
 RUN cd /mmdetection
 ENV FORCE_CUDA="1"
 RUN git clone https://github.com/gaurav67890/mmcv.git /mmcv
 RUN cd /mmcv && MMCV_WITH_OPS=1 pip install -e . && cd /mmdetection
-COPY crack_latest /mmdetection/crack_latest
-COPY crack_latest_mask /mmdetection/crack_latest_mask
+COPY dent_latest /mmdetection/dent_latest
+COPY dent_latest_mask /mmdetection/dent_latest_mask
 #COPY dent_sub /mmdetection/dent_sub
 
 WORKDIR /mmdetection
@@ -56,6 +56,6 @@ WORKDIR /mmdetection
 RUN pip install -r requirements/build.txt
 RUN pip install --no-cache-dir -e .
 
-ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/crack_detector_latest_segm.py","4"]
+ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/dent_detector_latest_segm.py","4"]
 #ENTRYPOINT ["./tools/dist_train.sh","configs/detectors/dent_detector_sub.py","4"]
 
