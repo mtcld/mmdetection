@@ -59,11 +59,11 @@ def size_check_ann(r_org):
     return size
 
 
-damage_name='dent'
+damage_name='crack'
 
-config_file = '../configs/detectors/dent_detector.py'
+config_file = '../configs/detectors/crack_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/disk1/dent_mmdet_model/epoch_9.pth'
+checkpoint_file = '../data/disk1/crack_latest_mmdet_model/epoch_14.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/disk1/dent/test_total.json'
-img_dir='/mmdetection/data/dent/disk1/images/'
+test_json='/mmdetection/data/disk1/crack_latest/annotations/crack_test_new.json'
+img_dir='/mmdetection/data/disk1/crack_latest/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -118,7 +118,9 @@ for cat in category_dict.keys():
 
             file_name=data['images'][i]['file_name']
             file_id=data['images'][i]['id']
+            print(img_dir+file_name)
             img=cv2.imread(img_dir+file_name)
+            print(img.shape)
             image_new_org=img.copy()
             
             org_bbox_dict={}
@@ -141,8 +143,8 @@ for cat in category_dict.keys():
             out=show_result_pyplot(model, img, result)
             print(out)
             bbox_pred=out[1]
-            classes_pred=out[2] 
-            scores_pred=out[3]
+            classes_pred=out[3] 
+            scores_pred=out[4]
 
             area_list=[]
             bbox_detected=[]

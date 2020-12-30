@@ -1,6 +1,6 @@
 import json
 
-json_in='instances_test.json'
+json_in='/mmdetection/data/disk1/crack_latest/annotations/crack_test_new.json'
 json_out=json_in.replace('.json','_sub.json')
 
 with open(json_in) as f:
