@@ -112,9 +112,9 @@ def main():
     cfg = Config.fromfile(args.config)
     print(cfg)
     cfg['data']['samples_per_gpu']=1
-    cfg['optimizer']['lr']=0.00972 
-    cfg['optimizer']['momentum']=0.89268 
-    cfg['lr_config']['step']=[11,16]
+    cfg['optimizer']['lr']=0.01 
+    cfg['optimizer']['momentum']=0.86064 
+    cfg['lr_config']['step']=[12,17]
     cfg['data']['imgs_per_gpu']=1
     #cfg['data']['workers_per_gpu']=1
     if args.cfg_options is not None:
