@@ -63,7 +63,7 @@ damage_name='crack'
 
 config_file = '../configs/detectors/crack_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/disk1/crack_latest_mmdet_model/epoch_14.pth'
+checkpoint_file = '../data/crack_latest_mmdet_model2/epoch_14.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/disk1/crack_latest/annotations/crack_test_new.json'
-img_dir='/mmdetection/data/disk1/crack_latest/images/'
+test_json='/mmdetection/data/crack_latest/annotations/crack_test_new.json'
+img_dir='/mmdetection/data/crack_latest/images/'
 
 with open(test_json) as f:
     data = json.load(f)
