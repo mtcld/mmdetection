@@ -3,8 +3,10 @@ from mmdet.apis import init_detector, inference_detector, show_result_pyplot
 import mmcv
 from matplotlib import pyplot as plt
 import cv2
+from skimage.color import gray2rgb
 import json
 from tqdm import tqdm
+from pydensecrf.utils import unary_from_labels, create_pairwise_bilateral
 import pydensecrf.densecrf as dcrf
 
 def crf(original_image, mask_img):
@@ -16,9 +18,9 @@ def crf(original_image, mask_img):
     d = dcrf.DenseCRF2D(original_image.shape[1], original_image.shape[0], n_labels)
     U = unary_from_labels(labels, n_labels, gt_prob=0.7, zero_unsure=False)
     d.setUnaryEnergy(U)
-    d.addPairwiseBilateral(sxy=25,srgb=4,rgbim=original_image, compat=10, kernel=dcrf.DIAG_KERNEL,
+    d.addPairwiseBilateral(sxy=10,srgb=3,rgbim=original_image, compat=50, kernel=dcrf.DIAG_KERNEL,
                           normalization=dcrf.NORMALIZE_SYMMETRIC)
-    Q = d.inference(10)
+    Q = d.inference(20)
     MAP = np.argmax(Q, axis=0)
     return MAP.reshape((original_image.shape[0], original_image.shape[1]))
 
@@ -37,7 +39,9 @@ with open(test_json) as f:
     
 iou=0
 l=0
-for i in range(len(data['images'])):
+#for i in range(len(data['images'])):
+for i in range(20):
+
     h=data['images'][i]['height']
     w=data['images'][i]['width']
     mask_act=np.zeros((h,w),dtype='uint8')
@@ -58,10 +62,11 @@ for i in range(len(data['images'])):
         out = show_result_pyplot(model, img, result)
         mask_pred=255*out[2].astype(np.uint8)
         mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
-    
+        
         for m in mask_pred:
             mask_pred_sum=cv2.bitwise_or(mask_pred_sum,m)
-        
+        #mask_pred_sum=crf(img, mask_pred_sum)
+        #print(mask_pred_sum)
         #cv2.imwrite('pred'+str(i)+'.jpg',255*mask_act)
         intersection = np.logical_and(mask_act, mask_pred_sum)
         union = np.logical_or(mask_act, mask_pred_sum)
