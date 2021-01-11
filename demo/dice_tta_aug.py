@@ -145,6 +145,7 @@ for i in range(len(data['images'])):
                 mask_pred_sum[int(h/2):h,int(w/2):w]=mask_pred_sub
                 pred_img_comb[int(h/2):h,int(w/2):w]=out[0]
             
+        mask_pred_sum=cv2.bitwise_and(mask_pred_sum,mask_car)
         intersection = np.logical_and(mask_act, mask_pred_sum)
         union = np.logical_or(mask_act, mask_pred_sum)
         iou_score = np.sum(intersection) / np.sum(union)
