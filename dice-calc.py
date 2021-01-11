@@ -40,7 +40,7 @@ with open(test_json) as f:
 iou=0
 l=0
 #for i in range(len(data['images'])):
-for i in range(20):
+for i in range(len(data['images'])):
 
     h=data['images'][i]['height']
     w=data['images'][i]['width']
@@ -59,7 +59,7 @@ for i in range(20):
         file_name = data['images'][i]['file_name']
         img = cv2.imread(img_dir + file_name)
         result = inference_detector(model, img)
-        out = show_result_pyplot(model, img, result)
+        out = show_result_pyplot(model, img, result,score_thr=0.4)
         mask_pred=255*out[2].astype(np.uint8)
         mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
         
