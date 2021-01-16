@@ -7,6 +7,7 @@ import json
 import numpy as np
 import pandas as pd
 import sys
+from tqdm import tqdm
 matplotlib.rcParams['figure.figsize'] = (20, 10)
 
 def draw_poly_org(p1,image1,color):
@@ -22,17 +23,17 @@ def draw_poly_org(p1,image1,color):
     cv2.drawContours(image, contours, -1, color, 2)    
     return image,contours
 
-config_file = '../configs/detectors/dent_detector_updated_segm.py'
+config_file = '/mmdetection/configs/detectors/scratch_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/crack_latest_mmdet_model2/epoch_14.pth'
+checkpoint_file = '../data/scratch_mmdet_gcp_model3/epoch_14.pth'
 
 # build the model from a config file and a checkpoint file
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
-test_json='/mmdetection/data/crack_latest/annotations/crack_test_new.json'
-carparts_json='/mmdetection/data/crack_test_cp_0.json'
-img_dir='/mmdetection/data/crack_latest/images/'
-csv_path='/mmdetection/data/crack_cp.csv'
+test_json='/mmdetection/data/scratch_latest/annotations/scratch_test.json'
+carparts_json='/mmdetection/data/scratch_test_cp_0.json'
+img_dir='/mmdetection/data/scratch_latest/images/'
+csv_path='/mmdetection/data/scratch_test_cp.csv'
 
 carparts_df=pd.read_csv(csv_path)
 
@@ -56,14 +57,25 @@ with open('carparts.json', 'w') as outfile:
 iou=0
 l=0
 #for i in range(len(data['images'])):
-for i in range(len(data['images'])):
+for i in tqdm(range(len(data['images']))):
     h=data['images'][i]['height']
     w=data['images'][i]['width']
     mask_car=np.zeros((h,w),dtype='uint8')
     mask_act=np.zeros((h,w),dtype='uint8')
+    
+    file_name = data['images'][i]['file_name']
+    
+    img = cv2.imread(img_dir + file_name)
+    img_org=img.copy()
+    
+    if img.shape[0]*img.shape[1]>6000*6000:
+            print('continue')
+            continue
+    
     for j in range(len(data['annotations'])):
         if data['annotations'][j]['image_id']==data['images'][i]['id']:
             p1=data['annotations'][j]['segmentation'][0]
+            image_new_org,p0=draw_poly_org(p1,img_org,(0,255,0))
             p1=[int(i) for i in p1]
             p2=[]
             for p in range(int(len(p1)/2)):
@@ -72,12 +84,11 @@ for i in range(len(data['images'])):
             cv2.fillPoly(mask_act, fill_pts, 255)
     if np.unique(mask_act,return_counts=True)[1][1]/(w*h)>0.00:
         l=l+1
-        file_name = data['images'][i]['file_name']
         
         carparts_df_sub_num=carparts_df[carparts_df['image_name']==file_name][['number']].iloc[0]
         print(carparts_df_sub_num)
         
-        if int(carparts_df_sub_num)>3:
+        if int(carparts_df_sub_num)>6:
             carparts_segm= carparts_dict[file_name]
 
             for cp in carparts_segm.keys():
@@ -93,7 +104,7 @@ for i in range(len(data['images'])):
         
         cv2.imwrite('mask/'+file_name,mask_car)
         
-        img = cv2.imread(img_dir + file_name)
+        
         pred_img_comb=np.zeros(img.shape,np.uint8)
         mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
         img1=img[0:int(h/2),0:int(w/2)]
@@ -102,7 +113,7 @@ for i in range(len(data['images'])):
         img4=img[int(h/2):h,int(w/2):w]
         
         resultf = inference_detector(model, img)
-        outf=show_result_pyplot(model, img, resultf,score_thr=0.4)
+        outf=show_result_pyplot(model, img, resultf,score_thr=0.3)
         pred_img=outf[0]
         
         mode=0
@@ -110,7 +121,7 @@ for i in range(len(data['images'])):
             mode=mode+1
             result = inference_detector(model, im)
 
-            out=show_result_pyplot(model, im, result,score_thr=0.4)
+            out=show_result_pyplot(model, im, result,score_thr=0.3)
             
             if mode==1:
                 pred_img_comb[0:int(h/2),0:int(w/2)]=out[0]
@@ -153,7 +164,7 @@ for i in range(len(data['images'])):
         print(iou_score)
         iou=iou+iou_score
     
-    vis = np.concatenate((pred_img, pred_img_comb), axis=1)
+    vis = np.concatenate((pred_img, pred_img_comb, image_new_org), axis=1)
     cv2.imwrite('predicted_images/'+file_name, vis)
 
     

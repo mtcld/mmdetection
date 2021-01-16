@@ -4,14 +4,14 @@ import numpy as np
 import pathlib
 from tqdm import tqdm
 
-damage_name='scratch_latest'
-image_dir='data/disk1/'+damage_name+'/images/'
-mask_dir='data/disk1/'+damage_name+'_mask'
+damage_name='crack_latest_aug'
+image_dir='data/'+damage_name+'/images/'
+mask_dir='data/'+damage_name+'_mask'
 pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True) 
-modes=['test','train','valid']
+modes=['test_new','train','valid']
 
 for mode in modes:    
-    p1='data/disk1/'+damage_name+'/annotations/scratch_'+mode+'.json'
+    p1='data/'+damage_name+'/annotations/crack_'+mode+'_aug.json'
     
     with open(p1) as f:
         data=json.load(f)

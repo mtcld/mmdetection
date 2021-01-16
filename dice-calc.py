@@ -24,14 +24,14 @@ def crf(original_image, mask_img):
     MAP = np.argmax(Q, axis=0)
     return MAP.reshape((original_image.shape[0], original_image.shape[1]))
 
-config_file = 'configs/detectors/dent_detector_updated_segm.py'
+config_file = '/mmdetection/configs/detectors/scratch_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = 'data/crack_latest_mmdet_model2/epoch_14.pth'
+checkpoint_file = 'data/scratch_mmdet_gcp_model3/epoch_14.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
-test_json='/mmdetection/data/crack_latest/annotations/crack_test_new.json'
-img_dir='/mmdetection/data/crack_latest/images/'
+test_json='/mmdetection/data/scratch_latest/annotations/scratch_test.json'
+img_dir='/mmdetection/data/scratch_latest/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -40,7 +40,7 @@ with open(test_json) as f:
 iou=0
 l=0
 #for i in range(len(data['images'])):
-for i in range(len(data['images'])):
+for i in tqdm(range(len(data['images']))):
 
     h=data['images'][i]['height']
     w=data['images'][i]['width']
@@ -58,6 +58,9 @@ for i in range(len(data['images'])):
         l=l+1
         file_name = data['images'][i]['file_name']
         img = cv2.imread(img_dir + file_name)
+        if img.shape[0]*img.shape[1]>6000*6000:
+            print('continue')
+            continue
         result = inference_detector(model, img)
         out = show_result_pyplot(model, img, result,score_thr=0.4)
         mask_pred=255*out[2].astype(np.uint8)
