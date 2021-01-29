@@ -28,74 +28,41 @@ model = dict(
             style='pytorch')))
 
 
-classes=['dent']
+classes=['crack']
 dataset_type = 'CocoDataset'
-data_root = '/mmdetection/data/disk1/'
+data_root = '/mmdetection/data/output_crack/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-# train_pipeline = [
-#     dict(type='LoadImageFromFile'),
-#     dict(type='LoadAnnotations', with_bbox=True),
-#     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
-#     dict(type='RandomFlip', flip_ratio=0.5),
-#     dict(type='Normalize', **img_norm_cfg),
-#     dict(type='Pad', size_divisor=32),
-#     dict(type='DefaultFormatBundle'),
-#     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
-# ]
-# test_pipeline = [
-#     dict(type='LoadImageFromFile'),
-#     dict(
-#         type='MultiScaleFlipAug',
-#         img_scale=(1333, 800),
-#         flip=False,
-#         transforms=[
-#             dict(type='Resize', keep_ratio=True),
-#             dict(type='RandomFlip'),
-#             dict(type='Normalize', **img_norm_cfg),
-#             dict(type='Pad', size_divisor=32),
-#             dict(type='ImageToTensor', keys=['img']),
-#             dict(type='Collect', keys=['img']),
-#         ])
-# ]
-# val_pipeline = [
-#     dict(type='LoadImageFromFile'),
-#     dict(type='LoadAnnotations', with_bbox=True),
-#     dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
-#     dict(type='RandomFlip', flip_ratio=0.5),
-#     dict(type='Normalize', **img_norm_cfg),
-#     dict(type='Pad', size_divisor=32),
-#     dict(type='DefaultFormatBundle'),
-#     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
-# ]
-
 
 data = dict(
-    imgs_per_gpu=2,
+    imgs_per_gpu=3,
     workers_per_gpu=2,
     train=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest/annotations/dent_train.json',
-        img_prefix=data_root + 'dent_latest/images/'),
+        ann_file=data_root + 'annotations/train_aug_2.json',
+        img_prefix=data_root + 'images/',
+        seg_prefix=data_root+'masks/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest/annotations/dent_valid.json',
+        ann_file=data_root + 'annotations/valid.json',
         #worflow = [('train', 1), ('val', 1)],
-        img_prefix=data_root + 'dent_latest/images/'),
+        img_prefix=data_root + 'images/',
+        seg_prefix=data_root+'masks_valid_test/'),
     test=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'dent_latest/annotations/dent_test.json',
-        img_prefix=data_root + 'dent_latest/images/'))
+        ann_file=data_root + 'annotations/test.json',
+        img_prefix=data_root + 'images/',
+        seg_prefix=data_root+'masks_valid_test/'))
 # optimizer
-# optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-# optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(_delete_=True,grad_clip=dict(max_norm=35, norm_type=2))
 # # learning policy
 # lr_config = dict(
 #     policy='step',
@@ -117,8 +84,8 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_detector_latest_segm'
+work_dir = './work_dirs/crack_cp_2'
 load_from = None
-resume_from = None
+resume_from = './work_dirs/crack_cp_2/epoch_2.pth'
 #workflow = [('train', 1)]
 workflow = [('train', 1), ('val', 1)]

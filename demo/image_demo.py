@@ -4,17 +4,17 @@ from matplotlib import pyplot as plt
 import cv2
 
 
-config_file = '../configs/detectors/dent_detector_updated_segm.py'
+config_file = '../configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/disk1/dent_updated_mmdet_model/epoch_13.pth'
+checkpoint_file = '../checkpoint/faster_rcnn_r50_fpn_1x_coco_20200130-047c8118.pth'
 
 
 # build the model from a config file and a checkpoint file
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
 # test a single image
-img = 'repair-car-dent-800x800.jpg'
+img = 'demo.jpg'
 result = inference_detector(model, img)
-
+print(result)
 # show the results
-out=show_result_pyplot(model, img, result)
+#out=show_result_pyplot(model, img, result)
