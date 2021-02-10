@@ -26,12 +26,12 @@ def crf(original_image, mask_img):
 
 config_file = 'configs/detectors/dent_detector_updated_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = 'data/crack_latest_mmdet_model2/epoch_14.pth'
+checkpoint_file = 'data/dent_latest_mmdet_model3/epoch_11.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
-test_json='/mmdetection/data/crack_latest/annotations/crack_test_new.json'
-img_dir='/mmdetection/data/crack_latest/images/'
+test_json='/mmdetection/data/dent_latest/annotations/dent_test.json'
+img_dir='/mmdetection/data/dent_latest/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -70,13 +70,13 @@ for i in range(len(data['images'])):
         #cv2.imwrite('pred'+str(i)+'.jpg',255*mask_act)
         intersection = np.logical_and(mask_act, mask_pred_sum)
         union = np.logical_or(mask_act, mask_pred_sum)
-        iou_score = np.sum(intersection) / np.sum(union)
-        print('iou_score')
+        iou_score = 2*np.sum(intersection) / (np.sum(union)+np.sum(intersection))
+        print('dice_score')
         print(iou_score)
         iou=iou+iou_score
     
 print('l_'+str(l))
-print('final_iou')
+print('final_dice')
 print(iou/l)
     
     

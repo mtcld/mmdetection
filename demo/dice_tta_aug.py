@@ -22,9 +22,9 @@ def draw_poly_org(p1,image1,color):
     cv2.drawContours(image, contours, -1, color, 2)    
     return image,contours
 
-config_file = '../configs/detectors/dent_detector_updated_segm.py'
+config_file = '../configs/detectors/crack_detector_latest_segm_aug.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../data/crack_latest_mmdet_model2/epoch_14.pth'
+checkpoint_file = '../work_dirs/crack_detector_latest_segm_aug/epoch_13.pth'
 
 # build the model from a config file and a checkpoint file
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
@@ -77,7 +77,10 @@ for i in range(len(data['images'])):
         carparts_df_sub_num=carparts_df[carparts_df['image_name']==file_name][['number']].iloc[0]
         print(carparts_df_sub_num)
         
-        if int(carparts_df_sub_num)>3:
+        img = cv2.imread(img_dir + file_name)
+        
+        if int(carparts_df_sub_num)>5:
+            print('Case1')
             carparts_segm= carparts_dict[file_name]
 
             for cp in carparts_segm.keys():
@@ -87,63 +90,64 @@ for i in range(len(data['images'])):
                     for i2 in range(int(0.5*len(pp))):
                         p1.append([pp[2*i2],pp[2*i2 +1]])
                     p1=np.array([p1],np.int32)
-                    cv2.fillPoly(mask_car, p1, 255 )
-        else:
-            mask_car=255*np.ones((h,w),dtype='uint8')
-        
-        cv2.imwrite('mask/'+file_name,mask_car)
-        
-        img = cv2.imread(img_dir + file_name)
-        pred_img_comb=np.zeros(img.shape,np.uint8)
-        mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
-        img1=img[0:int(h/2),0:int(w/2)]
-        img2=img[int(h/2):h,0:int(w/2)]
-        img3=img[0:int(h/2),int(w/2):w]
-        img4=img[int(h/2):h,int(w/2):w]
-        
-        resultf = inference_detector(model, img)
-        outf=show_result_pyplot(model, img, resultf,score_thr=0.4)
-        pred_img=outf[0]
-        
-        mode=0
-        for im in [img1,img2,img3,img4]:
-            mode=mode+1
-            result = inference_detector(model, im)
+                    cv2.fillPoly(mask_car, p1, 255 )                
+            
+            pred_img_comb=np.zeros(img.shape,np.uint8)
+            mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
+            img1=img[0:int(h/2),0:int(w/2)]
+            img2=img[int(h/2):h,0:int(w/2)]
+            img3=img[0:int(h/2),int(w/2):w]
+            img4=img[int(h/2):h,int(w/2):w]
 
-            out=show_result_pyplot(model, im, result,score_thr=0.4)
+            mode=0
+            for im in [img1,img2,img3,img4]:
+                mode=mode+1
+                result = inference_detector(model, im)
+
+                out=show_result_pyplot(model, im, result,score_thr=0.4)
+
+                if mode==1:
+                    pred_img_comb[0:int(h/2),0:int(w/2)]=out[0]
+                if mode==2:
+                    pred_img_comb[int(h/2):h,0:int(w/2)]=out[0]
+                if mode==3:
+                    pred_img_comb[0:int(h/2),int(w/2):w]=out[0]
+                if mode==4:
+                    pred_img_comb[int(h/2):h,int(w/2):w]=out[0]            
+
+
+                if len(out[2])==0:
+                    continue
+                mask_pred=255*out[2].astype(np.uint8)
+
+                shape=mask_pred[0].shape
+                mask_pred_sub=np.zeros(shape,np.uint8)
+
+                for m in mask_pred:
+                    mask_pred_sub=cv2.bitwise_or(mask_pred_sub,m)
+
+                if mode==1:
+                    mask_pred_sum[0:int(h/2),0:int(w/2)]=mask_pred_sub
+                    pred_img_comb[0:int(h/2),0:int(w/2)]=out[0]
+                if mode==2:
+                    mask_pred_sum[int(h/2):h,0:int(w/2)]=mask_pred_sub
+                    pred_img_comb[int(h/2):h,0:int(w/2)]=out[0]
+                if mode==3:
+                    mask_pred_sum[0:int(h/2),int(w/2):w]=mask_pred_sub
+                    pred_img_comb[0:int(h/2),int(w/2):w]=out[0]
+                if mode==4:
+                    mask_pred_sum[int(h/2):h,int(w/2):w]=mask_pred_sub
+                    pred_img_comb[int(h/2):h,int(w/2):w]=out[0]
             
-            if mode==1:
-                pred_img_comb[0:int(h/2),0:int(w/2)]=out[0]
-            if mode==2:
-                pred_img_comb[int(h/2):h,0:int(w/2)]=out[0]
-            if mode==3:
-                pred_img_comb[0:int(h/2),int(w/2):w]=out[0]
-            if mode==4:
-                pred_img_comb[int(h/2):h,int(w/2):w]=out[0]            
-            
-            
-            if len(out[2])==0:
+        else:
+            print('Case2')
+            mask_car=255*np.ones((h,w),dtype='uint8')
+            resultf = inference_detector(model, img)
+            outf=show_result_pyplot(model, img, resultf,score_thr=0.4)
+            pred_img_comb=outf[0]
+            if len(outf[2])==0:
                 continue
-            mask_pred=255*out[2].astype(np.uint8)
-            
-            shape=mask_pred[0].shape
-            mask_pred_sub=np.zeros(shape,np.uint8)
-                             
-            for m in mask_pred:
-                mask_pred_sub=cv2.bitwise_or(mask_pred_sub,m)
-                
-            if mode==1:
-                mask_pred_sum[0:int(h/2),0:int(w/2)]=mask_pred_sub
-                pred_img_comb[0:int(h/2),0:int(w/2)]=out[0]
-            if mode==2:
-                mask_pred_sum[int(h/2):h,0:int(w/2)]=mask_pred_sub
-                pred_img_comb[int(h/2):h,0:int(w/2)]=out[0]
-            if mode==3:
-                mask_pred_sum[0:int(h/2),int(w/2):w]=mask_pred_sub
-                pred_img_comb[0:int(h/2),int(w/2):w]=out[0]
-            if mode==4:
-                mask_pred_sum[int(h/2):h,int(w/2):w]=mask_pred_sub
-                pred_img_comb[int(h/2):h,int(w/2):w]=out[0]
+            mask_pred_sum=255*outf[2].astype(np.uint8)[0]
             
         mask_pred_sum=cv2.bitwise_and(mask_pred_sum,mask_car)
         intersection = np.logical_and(mask_act, mask_pred_sum)
@@ -153,8 +157,8 @@ for i in range(len(data['images'])):
         print(iou_score)
         iou=iou+iou_score
     
-    vis = np.concatenate((pred_img, pred_img_comb), axis=1)
-    cv2.imwrite('predicted_images/'+file_name, vis)
+    #vis = np.concatenate((pred_img, pred_img_comb), axis=1)
+    #cv2.imwrite('predicted_images/'+file_name, vis)
 
     
 print('l_'+str(l))
