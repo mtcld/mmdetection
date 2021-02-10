@@ -28,7 +28,13 @@ model = dict(
             style='pytorch')))
 
 
-classes=['dent']
+classes=["sli_side_turn_light","tyre","alloy_wheel","hli_head_light","hood",
+         "fwi_windshield","flp_front_license_plate","door","mirror","handle",
+         "qpa_quarter_panel","fender","grille","fbu_front_bumper","rocker_panel",
+         "rbu_rear_bumper","pillar","roof","blp_back_license_plate","window",
+         "rwi_rear_windshield","tail_gate","tli_tail_light","fbe_fog_light_bezel",
+         "fli_fog_light","fuel_tank_door","lli_low_bumper_tail_light"]
+
 dataset_type = 'CocoDataset'
 data_root = '/mmdetection/data/'
 img_norm_cfg = dict(
