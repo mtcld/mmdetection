@@ -50,15 +50,15 @@ test_pipeline = [
 ]
 data = dict(
     train=dict(
-        seg_prefix=data_root+'dent_latest_mask',
-        img_prefix=data_root + 'dent_latest2/images/',
+        seg_prefix=data_root+'dent_latest2_aug_mask',
+        img_prefix=data_root + 'dent_latest2_aug/images/',
         pipeline=train_pipeline),
     val=dict(
-        seg_prefix=data_root+'dent_latest_mask',
+        seg_prefix=data_root+'dent_latest2_aug_mask',
         pipeline=test_pipeline,
-        img_prefix=data_root + 'dent_latest2/images/'),
+        img_prefix=data_root + 'dent_latest2_aug/images/'),
     test=dict(
-        seg_prefix=data_root+'dent_latest_mask',
+        seg_prefix=data_root+'dent_latest2_aug_mask',
         pipeline=test_pipeline,
-        img_prefix=data_root + 'dent_latest2/images/'))
+        img_prefix=data_root + 'dent_latest2_aug/images/'))
 

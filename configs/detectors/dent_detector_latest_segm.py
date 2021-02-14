@@ -77,22 +77,22 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest2/annotations/dent_train.json',
-        img_prefix=data_root + 'dent_latest2/images/'),
+        ann_file=data_root + 'dent_latest2_aug/annotations/dent_train_aug.json',
+        img_prefix=data_root + 'dent_latest2_aug/images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest2/annotations/dent_valid.json',
+        ann_file=data_root + 'dent_latest2_aug/annotations/dent_valid.json',
         #worflow = [('train', 1), ('val', 1)],
-        img_prefix=data_root + 'dent_latest2/images/'),
+        img_prefix=data_root + 'dent_latest2_aug/images/'),
     test=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'dent_latest2/annotations/dent_test.json',
-        img_prefix=data_root + 'dent_latest2/images/'))
+        ann_file=data_root + 'dent_latest2_aug/annotations/dent_test.json',
+        img_prefix=data_root + 'dent_latest2_aug/images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 # optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
@@ -103,6 +103,9 @@ data = dict(
 #     warmup_iters=500,
 #     warmup_ratio=1.0 / 3,
 #     step=[8, 11])
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
+optimizer_config = dict(_delete_=True,grad_clip=dict(max_norm=35, norm_type=2))
+
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
@@ -117,7 +120,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_detector_latest_segm'
+work_dir = './work_dirs/dent_detector_latest_segm_aug'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
