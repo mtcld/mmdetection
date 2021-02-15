@@ -238,9 +238,12 @@ class CocoDataset(CustomDataset):
                     #print('#'*100)
                     #print(label)
                     #print(self.cat_ids[label])
-                    label=0
-                    data['category_id'] = self.cat_ids[0]
-                    label=0
+                    #label=0
+                    #data['category_id'] = self.cat_ids[0]
+                    #label=0
+                    print('TEST')
+                    print(self.cat_ids)
+                    print(label)
                     data['category_id'] = self.cat_ids[label]
                     bbox_json_results.append(data)
 
@@ -258,6 +261,7 @@ class CocoDataset(CustomDataset):
                     data['bbox'] = self.xyxy2xywh(bboxes[i])
                     data['score'] = float(mask_score[i])
                     data['category_id'] = self.cat_ids[label]
+                    
                     if isinstance(segms[i]['counts'], bytes):
                         segms[i]['counts'] = segms[i]['counts'].decode()
                     data['segmentation'] = segms[i]
@@ -486,6 +490,8 @@ class CocoDataset(CustomDataset):
                     # Compute per-category AP
                     # from https://github.com/facebookresearch/detectron2/
                     precisions = cocoEval.eval['precision']
+                    print('#'*100)
+                    print(type(cocoEval))
                     # precision: (iou, recall, cls, area range, max dets)
                     assert len(self.cat_ids) == precisions.shape[2]
 
@@ -495,6 +501,10 @@ class CocoDataset(CustomDataset):
                         # max dets index -1: typically 100 per image
                         nm = self.coco.loadCats(catId)[0]
                         precision = precisions[:, :, idx, 0, -1]
+                        precision=precision[:,9]
+                        print('Precision-'*40)
+                        print(precision.shape)
+                        print(precision)
                         precision = precision[precision > -1]
                         if precision.size:
                             ap = np.mean(precision)
@@ -502,11 +512,12 @@ class CocoDataset(CustomDataset):
                             ap = float('nan')
                         results_per_category.append(
                             (f'{nm["name"]}', f'{float(ap):0.3f}'))
-
+                    print('results_per_category')
+                    print(results_per_category)
                     num_columns = min(6, len(results_per_category) * 2)
                     results_flatten = list(
                         itertools.chain(*results_per_category))
-                    headers = ['category', 'AP'] * (num_columns // 2)
+                    headers = ['category', 'AP25'] * (num_columns // 2)
                     results_2d = itertools.zip_longest(*[
                         results_flatten[i::num_columns]
                         for i in range(num_columns)
@@ -514,6 +525,7 @@ class CocoDataset(CustomDataset):
                     table_data = [headers]
                     table_data += [result for result in results_2d]
                     table = AsciiTable(table_data)
+                    print('Table')
                     print_log('\n' + table.table, logger=logger)
 
                 if metric_items is None:

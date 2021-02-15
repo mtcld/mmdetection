@@ -28,12 +28,17 @@ model = dict(
             style='pytorch')))
 
 
-classes=["sli_side_turn_light","tyre","alloy_wheel","hli_head_light","hood",
-         "fwi_windshield","flp_front_license_plate","door","mirror","handle",
-         "qpa_quarter_panel","fender","grille","fbu_front_bumper","rocker_panel",
-         "rbu_rear_bumper","pillar","roof","blp_back_license_plate","window",
-         "rwi_rear_windshield","tail_gate","tli_tail_light","fbe_fog_light_bezel",
-         "fli_fog_light","fuel_tank_door","lli_low_bumper_tail_light"]
+#classes=["sli_side_turn_light","tyre","alloy_wheel","hli_head_light","hood",
+#         "fwi_windshield","flp_front_license_plate","door","mirror","handle",
+#         "qpa_quarter_panel","fender","grille","fbu_front_bumper","rocker_panel",
+#         "rbu_rear_bumper","pillar","roof","blp_back_license_plate","window",
+#         "rwi_rear_windshield","tail_gate","tli_tail_light","fbe_fog_light_bezel",
+#         "fli_fog_light","fuel_tank_door","lli_low_bumper_tail_light"]
+
+classes=["bumper","door","grille","w.indshield","mirror","tyre","window",
+        "handle","headlight","taillight","plate","foglight","fender",
+        "hood","trunk","roof","dickey"]
+
 
 dataset_type = 'CocoDataset'
 data_root = '/mmdetection/data/'
@@ -83,13 +88,13 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'carpart/annotations/train.json',
+        ann_file=data_root + 'carpart/annotations/carpart_train.json',
         img_prefix=data_root + 'carpart/images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'carpart/annotations/valid.json',
+        ann_file=data_root + 'carpart/annotations/carpart_valid.json',
         #worflow = [('train', 1), ('val', 1)],
         img_prefix=data_root + 'carpart/images/'),
     test=dict(
@@ -97,7 +102,7 @@ data = dict(
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'carpart/annotations/test.json',
+        ann_file=data_root + 'carpart/annotations/carpart_test.json',
         img_prefix=data_root + 'carpart/images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
@@ -123,7 +128,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_detector_latest_segm'
+work_dir = './work_dirs/carparts_detector_latest_segm'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]

@@ -90,6 +90,17 @@ def main():
     print('#'*100)
     print(cfg)
     print('#'*100)
+    cfg['model']['roi_head']['bbox_head'][0]['num_classes']=17
+    cfg['model']['roi_head']['bbox_head'][1]['num_classes']=17
+    cfg['model']['roi_head']['bbox_head'][2]['num_classes']=17
+
+    cfg['model']['roi_head']['mask_head'][0]['num_classes']=17
+    cfg['model']['roi_head']['mask_head'][1]['num_classes']=17
+    cfg['model']['roi_head']['mask_head'][2]['num_classes']=17
+
+    cfg['model']['roi_head']['semantic_head']['num_classes']=17
+
+    #sys.exit()
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
     # import modules from string list.

@@ -116,6 +116,15 @@ def main():
     cfg['optimizer']['momentum']=0.86064 
     cfg['lr_config']['step']=[12,17]
     cfg['data']['imgs_per_gpu']=1
+    cfg['model']['roi_head']['bbox_head'][0]['num_classes']=17
+    cfg['model']['roi_head']['bbox_head'][1]['num_classes']=17
+    cfg['model']['roi_head']['bbox_head'][2]['num_classes']=17
+
+    cfg['model']['roi_head']['mask_head'][0]['num_classes']=17
+    cfg['model']['roi_head']['mask_head'][1]['num_classes']=17
+    cfg['model']['roi_head']['mask_head'][2]['num_classes']=17
+
+    cfg['model']['roi_head']['semantic_head']['num_classes']=17
     #cfg['data']['workers_per_gpu']=1
     if args.cfg_options is not None:
         cfg.merge_from_dict(args.cfg_options)
