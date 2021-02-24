@@ -24,14 +24,14 @@ def crf(original_image, mask_img):
     MAP = np.argmax(Q, axis=0)
     return MAP.reshape((original_image.shape[0], original_image.shape[1]))
 
-config_file = 'configs/detectors/dent_detector_updated_segm.py'
+config_file = 'configs/detectors/missing_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = 'data/crack_latest_mmdet_model2/epoch_14.pth'
+checkpoint_file = 'work_dirs/missing_detector_latest_segm_aug/epoch_16.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
-test_json='/mmdetection/data/crack_latest/annotations/crack_test_new.json'
-img_dir='/mmdetection/data/crack_latest/images/'
+test_json='/mmdetection/data/total-missing/annotations/missing_test.json'
+img_dir='/mmdetection/data/total-missing/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -62,7 +62,7 @@ for i in range(len(data['images'])):
         out = show_result_pyplot(model, img, result,score_thr=0.4)
         mask_pred=255*out[2].astype(np.uint8)
         mask_pred_sum=np.zeros(img.shape[:2],dtype='uint8')
-        
+        cv2.imwrite('predicted_images/'+file_name,cv2.cvtColor(out[0], cv2.COLOR_BGR2RGB))
         for m in mask_pred:
             mask_pred_sum=cv2.bitwise_or(mask_pred_sum,m)
         #mask_pred_sum=crf(img, mask_pred_sum)
