@@ -77,22 +77,22 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'total-missing/annotations/missing_train.json',
-        img_prefix=data_root + 'total-missing/images/'),
+        ann_file=data_root + 'combine_missing/annotations/missing_train.json',
+        img_prefix=data_root + 'combine_missing/images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'total-missing/annotations/missing_valid.json',
+        ann_file=data_root + 'combine_missing/annotations/missing_valid.json',
         #worflow = [('train', 1), ('val', 1)],
-        img_prefix=data_root + 'total-missing/images/'),
+        img_prefix=data_root + 'combine_missing/images/'),
     test=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'total-missing/annotations/missing_test.json',
-        img_prefix=data_root + 'total-missing/images/'))
+        ann_file=data_root + 'combine_missing/annotations/missing_test.json',
+        img_prefix=data_root + 'combine_missing/images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 # optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
@@ -120,7 +120,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/missing_detector_latest_segm_aug'
+work_dir = './work_dirs/missing_detector_latest_segm_aug_combine'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
