@@ -4,7 +4,7 @@ import numpy as np
 import pathlib
 from tqdm import tqdm
 
-damage_name='total-missing'
+damage_name='combine_missing'
 image_dir='data/'+damage_name+'/images/'
 mask_dir='data/'+damage_name+'_mask'
 pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True) 
