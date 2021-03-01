@@ -63,7 +63,7 @@ damage_name='missing'
 
 config_file = '../configs/detectors/missing_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../work_dirs/missing_detector_latest_segm_aug/epoch_16.pth'
+checkpoint_file = '../work_dirs/missing_detector_latest_segm_aug_combine/epoch_11.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/total-missing/annotations/missing_test.json'
-img_dir='/mmdetection/data/total-missing/images/'
+test_json='/mmdetection/data/combine_missing/annotations/missing_test.json'
+img_dir='/mmdetection/data/combine_missing/images/'
 
 with open(test_json) as f:
     data = json.load(f)
