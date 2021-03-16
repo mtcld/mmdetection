@@ -267,10 +267,17 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
 
             # Filtering out all predictions with conf < conf_thr
             conf_thr = cfg.get('conf_thr', -1)
-            conf_inds = conf_pred.ge(conf_thr).nonzero().flatten()
-            bbox_pred = bbox_pred[conf_inds, :]
-            cls_pred = cls_pred[conf_inds, :]
-            conf_pred = conf_pred[conf_inds]
+            if conf_thr > 0 and (not torch.onnx.is_in_onnx_export()):
+                # TensorRT not support NonZero
+                # add as_tuple=False for compatibility in Pytorch 1.6
+                # flatten would create a Reshape op with constant values,
+                # and raise RuntimeError when doing inference in ONNX Runtime
+                # with a different input image (#4221).
+                conf_inds = conf_pred.ge(conf_thr).nonzero(
+                    as_tuple=False).squeeze(1)
+                bbox_pred = bbox_pred[conf_inds, :]
+                cls_pred = cls_pred[conf_inds, :]
+                conf_pred = conf_pred[conf_inds]
 
             # Get top-k prediction
             nms_pre = cfg.get('nms_pre', -1)
@@ -289,6 +296,13 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
         multi_lvl_bboxes = torch.cat(multi_lvl_bboxes)
         multi_lvl_cls_scores = torch.cat(multi_lvl_cls_scores)
         multi_lvl_conf_scores = torch.cat(multi_lvl_conf_scores)
+        # Set max number of box to be feed into nms in deployment
+        deploy_nms_pre = cfg.get('deploy_nms_pre', -1)
+        if deploy_nms_pre > 0 and torch.onnx.is_in_onnx_export():
+            _, topk_inds = multi_lvl_conf_scores.topk(deploy_nms_pre)
+            multi_lvl_bboxes = multi_lvl_bboxes[topk_inds, :]
+            multi_lvl_cls_scores = multi_lvl_cls_scores[topk_inds, :]
+            multi_lvl_conf_scores = multi_lvl_conf_scores[topk_inds]
 
         if with_nms and (multi_lvl_conf_scores.size(0) == 0):
             return torch.zeros((0, 5)), torch.zeros((0, ))
@@ -303,7 +317,8 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
         multi_lvl_cls_scores = torch.cat([multi_lvl_cls_scores, padding],
                                          dim=1)
 
-        if with_nms:
+        # Support exporting to onnx without nms
+        if with_nms and cfg.get('nms', None) is not None:
             det_bboxes, det_labels = multiclass_nms(
                 multi_lvl_bboxes,
                 multi_lvl_cls_scores,

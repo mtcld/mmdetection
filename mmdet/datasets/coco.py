@@ -2,13 +2,13 @@ import itertools
 import logging
 import os.path as osp
 import tempfile
+from collections import OrderedDict
 
 import mmcv
 import numpy as np
 from mmcv.utils import print_log
 from pycocotools.coco import COCO
-#from pycocotools.cocoeval import COCOeval
-from mmdet.datasets.fast_eval_api import COCOeval_opt as COCOeval
+from pycocotools.cocoeval import COCOeval
 from terminaltables import AsciiTable
 
 from mmdet.core import eval_recalls
@@ -17,7 +17,8 @@ from .custom import CustomDataset
 
 try:
     import pycocotools
-    assert pycocotools.__version__ >= '12.0.2'
+    if not hasattr(pycocotools, '__sphinx_mock__'):  # for doc generation
+        assert pycocotools.__version__ >= '12.0.2'
 except AssertionError:
     raise AssertionError('Incompatible version of pycocotools is installed. '
                          'Run pip uninstall pycocotools first. Then run pip '
@@ -167,8 +168,7 @@ class CocoDataset(CustomDataset):
             gt_bboxes_ignore = np.zeros((0, 4), dtype=np.float32)
 
         seg_map = img_info['filename'].replace('jpg', 'png')
-        #print('---'*100)
-        #print(img_info)
+
         ann = dict(
             bboxes=gt_bboxes,
             labels=gt_labels,
@@ -407,15 +407,14 @@ class CocoDataset(CustomDataset):
                 raise KeyError(f'metric {metric} is not supported')
         if iou_thrs is None:
             iou_thrs = np.linspace(
-                .10, 0.95, int(np.round((0.95 - .10) / .05)) + 1, endpoint=True)
-        print(iou_thrs)
+                .5, 0.95, int(np.round((0.95 - .5) / .05)) + 1, endpoint=True)
         if metric_items is not None:
             if not isinstance(metric_items, list):
                 metric_items = [metric_items]
 
         result_files, tmp_dir = self.format_results(results, jsonfile_prefix)
 
-        eval_results = {}
+        eval_results = OrderedDict()
         cocoGt = self.coco
         for metric in metrics:
             msg = f'Evaluating {metric}...'
@@ -456,17 +455,15 @@ class CocoDataset(CustomDataset):
                 'mAP': 0,
                 'mAP_50': 1,
                 'mAP_75': 2,
-                'mAP_25': 3,
-                'map_10':4,
-                'mAP_s': 5,
-                'mAP_m': 6,
-                'mAP_l': 7,
-                'AR@100': 8,
-                'AR@300': 9,
-                'AR@1000': 10,
-                'AR_s@1000': 11,
-                'AR_m@1000': 12,
-                'AR_l@1000': 13
+                'mAP_s': 3,
+                'mAP_m': 4,
+                'mAP_l': 5,
+                'AR@100': 6,
+                'AR@300': 7,
+                'AR@1000': 8,
+                'AR_s@1000': 9,
+                'AR_m@1000': 10,
+                'AR_l@1000': 11
             }
             if metric_items is not None:
                 for metric_item in metric_items:
@@ -529,7 +526,7 @@ class CocoDataset(CustomDataset):
 
                 if metric_items is None:
                     metric_items = [
-                        'mAP', 'mAP_50', 'mAP_75', 'mAP_25','map_10','mAP_s', 'mAP_m', 'mAP_l'
+                        'mAP', 'mAP_50', 'mAP_75', 'mAP_s', 'mAP_m', 'mAP_l'
                     ]
 
                 for metric_item in metric_items:

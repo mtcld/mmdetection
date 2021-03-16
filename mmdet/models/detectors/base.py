@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
-from torch import Tensor
+
 import mmcv
 import numpy as np
 import torch
@@ -9,6 +9,7 @@ import torch.nn as nn
 from mmcv.runner import auto_fp16
 from mmcv.utils import print_log
 
+from mmdet.core.visualization import imshow_det_bboxes
 from mmdet.utils import get_root_logger
 
 
@@ -61,7 +62,6 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         assert isinstance(imgs, list)
         return [self.extract_feat(img) for img in imgs]
 
-    @abstractmethod
     def forward_train(self, imgs, img_metas, **kwargs):
         """
         Args:
@@ -74,7 +74,12 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 :class:`mmdet.datasets.pipelines.Collect`.
             kwargs (keyword arguments): Specific to concrete implementation.
         """
-        pass
+        # NOTE the batched image size information may be useful, e.g.
+        # in DETR, this is needed for the construction of masks, which is
+        # then used for the transformer_head.
+        batch_input_shape = tuple(imgs[0].size()[-2:])
+        for img_meta in img_metas:
+            img_meta['batch_input_shape'] = batch_input_shape
 
     async def async_simple_test(self, img, img_metas, **kwargs):
         raise NotImplementedError
@@ -127,11 +132,6 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 augs (multiscale, flip, etc.) and the inner list indicates
                 images in a batch.
         """
-        
-        if isinstance(imgs, Tensor):
-            imgs = [imgs]
-            img_metas = [img_metas]
-            
         for var, name in [(imgs, 'imgs'), (img_metas, 'img_metas')]:
             if not isinstance(var, list):
                 raise TypeError(f'{name} must be a list, but got {type(var)}')
@@ -140,6 +140,14 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         if num_augs != len(img_metas):
             raise ValueError(f'num of augmentations ({len(imgs)}) '
                              f'!= num of image meta ({len(img_metas)})')
+
+        # NOTE the batched image size information may be useful, e.g.
+        # in DETR, this is needed for the construction of masks, which is
+        # then used for the transformer_head.
+        for img, img_meta in zip(imgs, img_metas):
+            batch_size = len(img_meta)
+            for img_id in range(batch_size):
+                img_meta[img_id]['batch_input_shape'] = tuple(img.size()[-2:])
 
         if num_augs == 1:
             # proposals (List[List[Tensor]]): the outer list indicates
@@ -263,10 +271,11 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                     img,
                     result,
                     score_thr=0.3,
-                    bbox_color='green',
-                    text_color='green',
-                    thickness=1,
-                    font_scale=0.5,
+                    bbox_color=(72, 101, 241),
+                    text_color=(72, 101, 241),
+                    mask_color=None,
+                    thickness=2,
+                    font_size=13,
                     win_name='',
                     show=False,
                     wait_time=0,
@@ -279,12 +288,17 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
                 bbox_result or (bbox_result, segm_result).
             score_thr (float, optional): Minimum score of bboxes to be shown.
                 Default: 0.3.
-            bbox_color (str or tuple or :obj:`Color`): Color of bbox lines.
-            text_color (str or tuple or :obj:`Color`): Color of texts.
-            thickness (int): Thickness of lines.
-            font_scale (float): Font scales of texts.
-            win_name (str): The window name.
-            wait_time (int): Value of waitKey param.
+            bbox_color (str or tuple(int) or :obj:`Color`):Color of bbox lines.
+               The tuple of color should be in BGR order. Default: 'green'
+            text_color (str or tuple(int) or :obj:`Color`):Color of texts.
+               The tuple of color should be in BGR order. Default: 'green'
+            mask_color (None or str or tuple(int) or :obj:`Color`):
+               Color of masks. The tuple of color should be in BGR order.
+               Default: None
+            thickness (int): Thickness of lines. Default: 2
+            font_size (int): Font size of texts. Default: 13
+            win_name (str): The window name. Default: ''
+            wait_time (float): Value of waitKey param.
                 Default: 0.
             show (bool): Whether to show the image.
                 Default: False.
@@ -297,57 +311,45 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         img = mmcv.imread(img)
         img = img.copy()
         if isinstance(result, tuple):
-            #print('yes')
             bbox_result, segm_result = result
-            #print(segm_result)
-            #print(len(bbox_result),len(segm_result))
             if isinstance(segm_result, tuple):
                 segm_result = segm_result[0]  # ms rcnn
-                #print(segm_result)
         else:
             bbox_result, segm_result = result, None
         bboxes = np.vstack(bbox_result)
-        #segmes=np.vstack(segm_result)
         labels = [
             np.full(bbox.shape[0], i, dtype=np.int32)
             for i, bbox in enumerate(bbox_result)
         ]
         labels = np.concatenate(labels)
-        #print(len(bboxes))
         # draw segmentation masks
+        segms = None
         if segm_result is not None and len(labels) > 0:  # non empty
             segms = mmcv.concat_list(segm_result)
-            inds = np.where(bboxes[:, -1] > score_thr)[0]
-            np.random.seed(42)
-            color_masks = [
-                np.random.randint(0, 256, (1, 3), dtype=np.uint8)
-                for _ in range(max(labels) + 1)
-            ]
-            for i in inds:
-                i = int(i)
-                color_mask = color_masks[labels[i]]
-                mask = segms[i].astype(bool)
-                #img[mask] = img[mask] * 0.5 + color_mask * 0.5
-        #print(len(segms))
+            if isinstance(segms[0], torch.Tensor):
+                segms = torch.stack(segms, dim=0).detach().cpu().numpy()
+            else:
+                segms = np.stack(segms, axis=0)
         # if out_file specified, do not show image in window
         if out_file is not None:
             show = False
         # draw bounding boxes
-        img,bbox,segm,label,scores=mmcv.imshow_det_bboxes(
+        img = imshow_det_bboxes(
             img,
             bboxes,
-            segms,
             labels,
+            segms,
             class_names=self.CLASSES,
             score_thr=score_thr,
             bbox_color=bbox_color,
             text_color=text_color,
+            mask_color=mask_color,
             thickness=thickness,
-            font_scale=font_scale,
+            font_size=font_size,
             win_name=win_name,
             show=show,
             wait_time=wait_time,
             out_file=out_file)
 
         if not (show or out_file):
-            return img,bbox,segm,label,scores
+            return img

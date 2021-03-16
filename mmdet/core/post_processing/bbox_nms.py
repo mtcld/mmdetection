@@ -9,7 +9,8 @@ def multiclass_nms(multi_bboxes,
                    score_thr,
                    nms_cfg,
                    max_num=-1,
-                   score_factors=None):
+                   score_factors=None,
+                   return_inds=False):
     """NMS for multi-class bboxes.
 
     Args:
@@ -19,14 +20,16 @@ def multiclass_nms(multi_bboxes,
         score_thr (float): bbox threshold, bboxes with scores lower than it
             will not be considered.
         nms_thr (float): NMS IoU threshold
-        max_num (int): if there are more than max_num bboxes after NMS,
-            only top max_num will be kept.
-        score_factors (Tensor): The factors multiplied to scores before
-            applying NMS
+        max_num (int, optional): if there are more than max_num bboxes after
+            NMS, only top max_num will be kept. Default to -1.
+        score_factors (Tensor, optional): The factors multiplied to scores
+            before applying NMS. Default to None.
+        return_inds (bool, optional): Whether return the indices of kept
+            bboxes. Default to False.
 
     Returns:
-        tuple: (bboxes, labels), tensors of shape (k, 5) and (k, 1). Labels \
-            are 0-based.
+        tuple: (bboxes, labels, indices (optional)), tensors of shape (k, 5),
+            (k), and (k). Labels are 0-based.
     """
     num_classes = multi_scores.size(1) - 1
     # exclude background category
@@ -35,32 +38,48 @@ def multiclass_nms(multi_bboxes,
     else:
         bboxes = multi_bboxes[:, None].expand(
             multi_scores.size(0), num_classes, 4)
+
     scores = multi_scores[:, :-1]
 
-    # filter out boxes with low scores
-    valid_mask = scores > score_thr
+    labels = torch.arange(num_classes, dtype=torch.long)
+    labels = labels.view(1, -1).expand_as(scores)
 
-    # We use masked_select for ONNX exporting purpose,
-    # which is equivalent to bboxes = bboxes[valid_mask]
-    # (TODO): as ONNX does not support repeat now,
-    # we have to use this ugly code
-    bboxes = torch.masked_select(
-        bboxes,
-        torch.stack((valid_mask, valid_mask, valid_mask, valid_mask),
-                    -1)).view(-1, 4)
+    bboxes = bboxes.reshape(-1, 4)
+    scores = scores.reshape(-1)
+    labels = labels.reshape(-1)
+
+    if not torch.onnx.is_in_onnx_export():
+        # NonZero not supported  in TensorRT
+        # remove low scoring boxes
+        valid_mask = scores > score_thr
+    # multiply score_factor after threshold to preserve more bboxes, improve
+    # mAP by 1% for YOLOv3
     if score_factors is not None:
-        scores = scores * score_factors[:, None]
-    scores = torch.masked_select(scores, valid_mask)
-    labels = valid_mask.nonzero(as_tuple=False)[:, 1]
+        # expand the shape to match original shape of score
+        score_factors = score_factors.view(-1, 1).expand(
+            multi_scores.size(0), num_classes)
+        score_factors = score_factors.reshape(-1)
+        scores = scores * score_factors
+
+    if not torch.onnx.is_in_onnx_export():
+        # NonZero not supported  in TensorRT
+        inds = valid_mask.nonzero(as_tuple=False).squeeze(1)
+        bboxes, scores, labels = bboxes[inds], scores[inds], labels[inds]
+    else:
+        # TensorRT NMS plugin has invalid output filled with -1
+        # add dummy data to make detection output correct.
+        bboxes = torch.cat([bboxes, bboxes.new_zeros(1, 4)], dim=0)
+        scores = torch.cat([scores, scores.new_zeros(1)], dim=0)
+        labels = torch.cat([labels, labels.new_zeros(1)], dim=0)
 
     if bboxes.numel() == 0:
-        bboxes = multi_bboxes.new_zeros((0, 5))
-        labels = multi_bboxes.new_zeros((0, ), dtype=torch.long)
-
         if torch.onnx.is_in_onnx_export():
             raise RuntimeError('[ONNX Error] Can not record NMS '
                                'as it has not been executed this time')
-        return bboxes, labels
+        if return_inds:
+            return bboxes, labels, inds
+        else:
+            return bboxes, labels
 
     dets, keep = batched_nms(bboxes, scores, labels, nms_cfg)
 
@@ -68,7 +87,10 @@ def multiclass_nms(multi_bboxes,
         dets = dets[:max_num]
         keep = keep[:max_num]
 
-    return dets, labels[keep]
+    if return_inds:
+        return dets, labels[keep], keep
+    else:
+        return dets, labels[keep]
 
 
 def fast_nms(multi_bboxes,

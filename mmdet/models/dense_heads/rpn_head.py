@@ -1,6 +1,10 @@
+import copy
+import warnings
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from mmcv import ConfigDict
 from mmcv.cnn import normal_init
 from mmcv.ops import batched_nms
 
@@ -106,12 +110,15 @@ class RPNHead(RPNTestMixin, AnchorHead):
                 5-th column is a score between 0 and 1.
         """
         cfg = self.test_cfg if cfg is None else cfg
+        cfg = copy.deepcopy(cfg)
         # bboxes from different level should be independent during NMS,
         # level_ids are used as labels for batched NMS to separate them
         level_ids = []
         mlvl_scores = []
         mlvl_bbox_preds = []
         mlvl_valid_anchors = []
+        nms_pre_tensor = torch.tensor(
+            cfg.nms_pre, device=cls_scores[0].device, dtype=torch.long)
         for idx in range(len(cls_scores)):
             rpn_cls_score = cls_scores[idx]
             rpn_bbox_pred = bbox_preds[idx]
@@ -129,14 +136,26 @@ class RPNHead(RPNTestMixin, AnchorHead):
                 scores = rpn_cls_score.softmax(dim=1)[:, 0]
             rpn_bbox_pred = rpn_bbox_pred.permute(1, 2, 0).reshape(-1, 4)
             anchors = mlvl_anchors[idx]
-            if cfg.nms_pre > 0 and scores.shape[0] > cfg.nms_pre:
+            if cfg.nms_pre > 0:
                 # sort is faster than topk
                 # _, topk_inds = scores.topk(cfg.nms_pre)
-                ranked_scores, rank_inds = scores.sort(descending=True)
-                topk_inds = rank_inds[:cfg.nms_pre]
-                scores = ranked_scores[:cfg.nms_pre]
-                rpn_bbox_pred = rpn_bbox_pred[topk_inds, :]
-                anchors = anchors[topk_inds, :]
+                # keep topk op for dynamic k in onnx model
+                if torch.onnx.is_in_onnx_export():
+                    # sort op will be converted to TopK in onnx
+                    # and k<=3480 in TensorRT
+                    scores_shape = torch._shape_as_tensor(scores)
+                    nms_pre = torch.where(scores_shape[0] < nms_pre_tensor,
+                                          scores_shape[0], nms_pre_tensor)
+                    _, topk_inds = scores.topk(nms_pre)
+                    scores = scores[topk_inds]
+                    rpn_bbox_pred = rpn_bbox_pred[topk_inds, :]
+                    anchors = anchors[topk_inds, :]
+                elif scores.shape[0] > cfg.nms_pre:
+                    ranked_scores, rank_inds = scores.sort(descending=True)
+                    topk_inds = rank_inds[:cfg.nms_pre]
+                    scores = ranked_scores[:cfg.nms_pre]
+                    rpn_bbox_pred = rpn_bbox_pred[topk_inds, :]
+                    anchors = anchors[topk_inds, :]
             mlvl_scores.append(scores)
             mlvl_bbox_preds.append(rpn_bbox_pred)
             mlvl_valid_anchors.append(anchors)
@@ -150,7 +169,8 @@ class RPNHead(RPNTestMixin, AnchorHead):
             anchors, rpn_bbox_pred, max_shape=img_shape)
         ids = torch.cat(level_ids)
 
-        if cfg.min_bbox_size > 0:
+        # Skip nonzero op while exporting to ONNX
+        if cfg.min_bbox_size > 0 and (not torch.onnx.is_in_onnx_export()):
             w = proposals[:, 2] - proposals[:, 0]
             h = proposals[:, 3] - proposals[:, 1]
             valid_inds = torch.nonzero(
@@ -162,7 +182,32 @@ class RPNHead(RPNTestMixin, AnchorHead):
                 scores = scores[valid_inds]
                 ids = ids[valid_inds]
 
-        # TODO: remove the hard coded nms type
-        nms_cfg = dict(type='nms', iou_threshold=cfg.nms_thr)
-        dets, keep = batched_nms(proposals, scores, ids, nms_cfg)
-        return dets[:cfg.nms_post]
+        # deprecate arguments warning
+        if 'nms' not in cfg or 'max_num' in cfg or 'nms_thr' in cfg:
+            warnings.warn(
+                'In rpn_proposal or test_cfg, '
+                'nms_thr has been moved to a dict named nms as '
+                'iou_threshold, max_num has been renamed as max_per_img, '
+                'name of original arguments and the way to specify '
+                'iou_threshold of NMS will be deprecated.')
+        if 'nms' not in cfg:
+            cfg.nms = ConfigDict(dict(type='nms', iou_threshold=cfg.nms_thr))
+        if 'max_num' in cfg:
+            if 'max_per_img' in cfg:
+                assert cfg.max_num == cfg.max_per_img, f'You ' \
+                    f'set max_num and ' \
+                    f'max_per_img at the same time, but get {cfg.max_num} ' \
+                    f'and {cfg.max_per_img} respectively' \
+                    'Please delete max_num which will be deprecated.'
+            else:
+                cfg.max_per_img = cfg.max_num
+        if 'nms_thr' in cfg:
+            assert cfg.nms.iou_threshold == cfg.nms_thr, f'You set' \
+                f' iou_threshold in nms and ' \
+                f'nms_thr at the same time, but get' \
+                f' {cfg.nms.iou_threshold} and {cfg.nms_thr}' \
+                f' respectively. Please delete the nms_thr ' \
+                f'which will be deprecated.'
+
+        dets, keep = batched_nms(proposals, scores, ids, cfg.nms)
+        return dets[:cfg.max_per_img]

@@ -236,8 +236,7 @@ class LoadAnnotations(object):
         Returns:
             dict: The dict contains loaded bounding box annotations.
         """
-        #print('result')
-        #print(results)
+
         ann_info = results['ann_info']
         results['gt_bboxes'] = ann_info['bboxes'].copy()
 
@@ -343,10 +342,8 @@ class LoadAnnotations(object):
         if self.file_client is None:
             self.file_client = mmcv.FileClient(**self.file_client_args)
 
-        #print('7'*300)
-        #print(results)
         filename = osp.join(results['seg_prefix'],
-                            results['ann_info']['seg_map'][0:results['ann_info']['seg_map'].rfind('.')]+'.png')
+                            results['ann_info']['seg_map'])
         img_bytes = self.file_client.get(filename)
         results['gt_semantic_seg'] = mmcv.imfrombytes(
             img_bytes, flag='unchanged').squeeze()
@@ -381,8 +378,8 @@ class LoadAnnotations(object):
         repr_str += f'(with_bbox={self.with_bbox}, '
         repr_str += f'with_label={self.with_label}, '
         repr_str += f'with_mask={self.with_mask}, '
-        repr_str += f'with_seg={self.with_seg})'
-        repr_str += f'poly2mask={self.poly2mask})'
+        repr_str += f'with_seg={self.with_seg}, '
+        repr_str += f'poly2mask={self.poly2mask}, '
         repr_str += f'poly2mask={self.file_client_args})'
         return repr_str
 

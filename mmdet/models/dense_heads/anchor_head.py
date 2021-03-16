@@ -23,7 +23,10 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         anchor_generator (dict): Config dict for anchor generator
         bbox_coder (dict): Config of bounding box coder.
         reg_decoded_bbox (bool): If true, the regression loss would be
-            applied on decoded bounding boxes. Default: False
+            applied directly on decoded bounding boxes, converting both
+            the predicted boxes and regression targets to absolute
+            coordinates format. Default False. It should be `True` when
+            using `IoULoss`, `GIoULoss`, or `DIoULoss` in the bbox head.
         loss_cls (dict): Config of classification loss.
         loss_bbox (dict): Config of localization loss.
         train_cfg (dict): Training config of anchor head.
@@ -41,6 +44,7 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
                      strides=[4, 8, 16, 32, 64]),
                  bbox_coder=dict(
                      type='DeltaXYWHBBoxCoder',
+                     clip_border=True,
                      target_means=(.0, .0, .0, .0),
                      target_stds=(1.0, 1.0, 1.0, 1.0)),
                  reg_decoded_bbox=False,
@@ -407,6 +411,9 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         bbox_weights = bbox_weights.reshape(-1, 4)
         bbox_pred = bbox_pred.permute(0, 2, 3, 1).reshape(-1, 4)
         if self.reg_decoded_bbox:
+            # When the regression loss (e.g. `IouLoss`, `GIouLoss`)
+            # is applied directly on the decoded bounding boxes, it
+            # decodes the already encoded coordinates to absolute format.
             anchors = anchors.reshape(-1, 4)
             bbox_pred = self.bbox_coder.decode(anchors, bbox_pred)
         loss_bbox = self.loss_bbox(
@@ -560,7 +567,11 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             bbox_pred_list = [
                 bbox_preds[i][img_id].detach() for i in range(num_levels)
             ]
-            img_shape = img_metas[img_id]['img_shape']
+            # get origin input shape to support onnx dynamic shape
+            if torch.onnx.is_in_onnx_export():
+                img_shape = img_metas[img_id]['img_shape_for_onnx']
+            else:
+                img_shape = img_metas[img_id]['img_shape']
             scale_factor = img_metas[img_id]['scale_factor']
             if with_nms:
                 # some heads don't support with_nms argument
@@ -613,6 +624,11 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         """
         cfg = self.test_cfg if cfg is None else cfg
         assert len(cls_score_list) == len(bbox_pred_list) == len(mlvl_anchors)
+        # convert to tensor to keep tracing
+        nms_pre_tensor = torch.tensor(
+            cfg.get('nms_pre', -1),
+            device=cls_score_list[0].device,
+            dtype=torch.long)
         mlvl_bboxes = []
         mlvl_scores = []
         for cls_score, bbox_pred, anchors in zip(cls_score_list,
@@ -625,8 +641,14 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             else:
                 scores = cls_score.softmax(-1)
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 4)
-            nms_pre = cfg.get('nms_pre', -1)
-            if nms_pre > 0 and scores.shape[0] > nms_pre:
+            # Always keep topk op for dynamic input in onnx
+            if nms_pre_tensor > 0 and (torch.onnx.is_in_onnx_export()
+                                       or scores.shape[-2] > nms_pre_tensor):
+                from torch import _shape_as_tensor
+                # keep shape as tensor and get k
+                num_anchor = _shape_as_tensor(scores)[-2].to(nms_pre_tensor)
+                nms_pre = torch.where(nms_pre_tensor < num_anchor,
+                                      nms_pre_tensor, num_anchor)
                 # Get maximum scores for foreground classes.
                 if self.use_sigmoid_cls:
                     max_scores, _ = scores.max(dim=1)
@@ -647,6 +669,13 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         if rescale:
             mlvl_bboxes /= mlvl_bboxes.new_tensor(scale_factor)
         mlvl_scores = torch.cat(mlvl_scores)
+        # Set max number of box to be feed into nms in deployment
+        deploy_nms_pre = cfg.get('deploy_nms_pre', -1)
+        if deploy_nms_pre > 0 and torch.onnx.is_in_onnx_export():
+            max_scores, _ = mlvl_scores.max(dim=1)
+            _, topk_inds = max_scores.topk(deploy_nms_pre)
+            mlvl_scores = mlvl_scores[topk_inds, :]
+            mlvl_bboxes = mlvl_bboxes[topk_inds, :]
         if self.use_sigmoid_cls:
             # Add a dummy background class to the backend when using sigmoid
             # remind that we set FG labels to [0, num_class-1] since mmdet v2.0

@@ -16,7 +16,7 @@ model = dict(
             num_classes=183,
             ignore_label=255,
             loss_weight=0.2)))
-data_root = '/mmdetection/data/disk1/'
+data_root = 'data/coco/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -50,14 +50,7 @@ test_pipeline = [
 ]
 data = dict(
     train=dict(
-        seg_prefix=data_root+'dent_latest_mask',
-        img_prefix=data_root + 'dent_latest/images/',
+        seg_prefix=data_root + 'stuffthingmaps/train2017/',
         pipeline=train_pipeline),
-    val=dict(
-        seg_prefix=data_root+'dent_latest_mask',
-        pipeline=test_pipeline,
-        img_prefix=data_root + 'dent_latest/images/'),
-    test=dict(
-        seg_prefix=data_root+'dent_latest_mask',
-        pipeline=test_pipeline,
-        img_prefix=data_root + 'dent_latest/images/'))
+    val=dict(pipeline=test_pipeline),
+    test=dict(pipeline=test_pipeline))
