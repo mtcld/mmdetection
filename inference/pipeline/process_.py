@@ -28,6 +28,20 @@ def get_mask_from_demo(predictions, res):
     return pred_mask, mask_act
 
 async def API_call(img_path, model_name):
+    '''
+    This block is the only code who talks with the model_config[currently DetectoRS]
+    
+    Input requirement:
+    img_path: The path of the image which will be detected 
+    model_name: The name of the model which will be detecting the image
+
+    Output requirement:
+    [pred_image, {
+            "labels": sample_labels_with_class_names, 
+            "scores": sample_filtered_score, 
+            "mask": sample_segms_ndarray
+        }]
+    '''
     sample_model = model_list[model_name]
     sample_json = sample_model.inference(img_path)
     return sample_json

@@ -15,6 +15,9 @@ damage_list=['scratch','crack','dent']
 class Model():
 
     def __init__(self, config_file, checkpoint_file, category_name):
+        '''
+        Init method is called to initialize the configuration for inference
+        '''
         self.config_file= config_file
         self.checkpoint_file = checkpoint_file
         self.category_name = category_name
@@ -25,12 +28,29 @@ class Model():
         self.text_color = (72, 101, 241)
 
     def initialize_model(self):
-        # Building the model from a config file and a checkpoint file
+        '''
+        Building the model from config & checkpoint file
+        '''
         model = init_detector(self.config_file, self.checkpoint_file, device='cuda:0')
         self.category_model = model
 
     def inference(self, img):
+        '''
+        Inference of an image start here with the added code to 
+        give the json for the main logic code to detect damage inside car part
+        so that the json is confined here and the code shouldn't be touched on 
+        the process_.py. To understand what is happening here the code is 
+        properly document on the jupyter notebook inside the 
+        mmdetection/demo/inference_demo.ipynb
 
+        Output Format:
+        [pred_image, {
+            "labels": sample_labels_with_class_names, 
+            "scores": sample_filtered_score, 
+            "mask": sample_segms_ndarray
+        }]
+
+        '''
         model = self.category_model
         # # Infering on a single image
         result = inference_detector(model, img)
@@ -99,6 +119,9 @@ class Model():
                                 }]
 
 def get_all_model():
+    '''
+    Getting all the models & get ready to infer
+    '''
     car_model=Model(config['CAR']['config_file'], config['CAR']['checkpoint_file'], config['CAR']['category_name'] )
     carpart_model=Model(config['CARPART']['config_file'], config['CARPART']['checkpoint_file'], config['CARPART']['category_name'] )
     dent_model=Model(config['DENT']['config_file'], config['DENT']['checkpoint_file'], config['DENT']['category_name'] )
@@ -108,4 +131,7 @@ def get_all_model():
     return {'car':car_model,'carpart':carpart_model,'scratch':scratch_model,'dent':dent_model,'crack':crack_model}
 
 def get_damage_list():
+    '''
+    Return the damage list [Currently dent, crack & scratch]
+    '''
     return damage_list

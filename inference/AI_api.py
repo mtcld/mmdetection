@@ -5,9 +5,13 @@ import io
 from io import BytesIO
 from pipeline.mc_util import *
 
-work_dir="/workspace/images/test"
+work_dir="/workspace/output/"
 
 def get_result_pipline(uuid,vin):
+    '''
+    This block of code will detect car and carpart first, then send the
+    json to the damage predictor to detect damage and map it to car part
+    '''
     files = get_all_file(os.path.join(work_dir,"images/"+ uuid))
     output_dir=os.path.join(work_dir,"images/"+ uuid + "/output")
     carpart_output_list=[]
@@ -20,12 +24,8 @@ def get_result_pipline(uuid,vin):
     for i, file in enumerate(files):
         data,_ = predict_damage(file,carpart_output_list[i])
         damage_output.append(data)
-    
-    print('giving the dict to postprocess')
-    print(damage_output)
+
     out_dict = post_process(vin, damage_output)
-    print('returning out_dict')
-    print(out_dict)
     return [{"out_dict":out_dict}]
 
 def preprocess(data):
