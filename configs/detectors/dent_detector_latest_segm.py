@@ -77,22 +77,22 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest2_new/annotations/dent_train_aug.json',
-        img_prefix=data_root + 'dent_latest2_new/images/'),
+        ann_file=data_root + 'dent_aug/annotations/dent_train_aug.json',
+        img_prefix=data_root + 'dent_aug/images/'),
     val=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_latest2_new/annotations/dent_valid.json',
+        ann_file=data_root + 'dent_aug/annotations/dent_valid.json',
         #worflow = [('train', 1), ('val', 1)],
-        img_prefix=data_root + 'dent_latest2_new/images/'),
+        img_prefix=data_root + 'dent_aug/images/'),
     test=dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
         #worflow = [('train', 1), ('val', 1)],
-        ann_file=data_root + 'dent_latest2_new/annotations/dent_test.json',
-        img_prefix=data_root + 'dent_latest2_new/images/'))
+        ann_file=data_root + 'dent_aug/annotations/dent_test.json',
+        img_prefix=data_root + 'dent_aug/images/'))
 # optimizer
 # optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 # optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
