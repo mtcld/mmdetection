@@ -4,11 +4,11 @@ import numpy as np
 import pathlib
 from tqdm import tqdm
 
-damage_name='dent_latest2_aug'
+damage_name='dent_latest2'
 image_dir='data/'+damage_name+'/images/'
 mask_dir='data/'+damage_name+'_mask'
 pathlib.Path(mask_dir).mkdir(parents=True, exist_ok=True) 
-modes=['test','train_aug','valid']
+modes=['test','train','valid']
 
 for mode in modes:    
     p1='data/'+damage_name+'/annotations/dent_'+mode+'.json'
