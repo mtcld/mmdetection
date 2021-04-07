@@ -63,7 +63,7 @@ damage_name='dent'
 
 config_file = '../configs/detectors/dent_detector_latest_segm.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../work_dirs/dent_detector_latest_segm_aug2/epoch_9.pth'
+checkpoint_file = '../work_dirs/dent_detector_latest_segm_aug2_10k/epoch_9.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 

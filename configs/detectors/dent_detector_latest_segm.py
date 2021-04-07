@@ -77,7 +77,7 @@ data = dict(
         type=dataset_type,
         classes=classes,
         test_mode=False,
-        ann_file=data_root + 'dent_aug/annotations/dent_train10k_aug.json',
+        ann_file=data_root + 'dent_aug/annotations/dent_train5k_aug.json',
         img_prefix=data_root + 'dent_aug/images/'),
     val=dict(
         type=dataset_type,
@@ -120,7 +120,7 @@ evaluation = dict(interval=1)
 total_epochs = 50
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/dent_detector_latest_segm_aug2_10k'
+work_dir = './work_dirs/dent_detector_latest_segm_aug2_5k'
 load_from = None
 resume_from = None
 #workflow = [('train', 1)]
