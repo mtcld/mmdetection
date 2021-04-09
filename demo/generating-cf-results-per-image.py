@@ -52,18 +52,18 @@ def size_check_ann(r_org):
     area_org=rect_area_single(r_org)
     if area_org<32**2:
         size='small'
-    if area_org>32**2 and area_org<96**2:
+    if area_org>=32**2 and area_org<96**2:
         size='medium'
-    if area_org>96**2:
+    if area_org>=96**2:
         size='large'
     return size
 
 
-damage_name='dent'
+damage_name='scratch'
 
-config_file = '../configs/detectors/dent_detector_latest_segm.py'
+config_file = '../models/scrach_mosaic_5k/scratch_mosaic_detectors.py'
 # download the checkpoint from model zoo and put it in `checkpoints/`
-checkpoint_file = '../work_dirs/dent_detector_latest_segm_aug2_10k/epoch_9.pth'
+checkpoint_file = '../models/scrach_mosaic_5k/epoch_9.pth'
 
 model = init_detector(config_file, checkpoint_file, device='cuda:0')
 
@@ -73,8 +73,8 @@ Rectangle = namedtuple('Rectangle', 'xmin ymin xmax ymax')
 file_store=damage_name + '_files/'
 fp_store=damage_name + '_fp/'
 
-test_json='/mmdetection/data/dent_aug/annotations/dent_test.json'
-img_dir='/mmdetection/data/dent_aug/images/'
+test_json='/mmdetection/data/scratch/annotations/test.json'
+img_dir='/mmdetection/data/scratch/images/'
 
 with open(test_json) as f:
     data = json.load(f)
@@ -103,8 +103,8 @@ FN=0
 
 for cat in category_dict.keys():
     catnew=cat
-    print('catnew')
-    print(catnew)
+    #print('catnew')
+    #print(catnew)
     catstr=str(catnew)+'_'
     for i in tqdm(range(len(data['images']))):
         fp_check=0
@@ -118,9 +118,9 @@ for cat in category_dict.keys():
 
             file_name=data['images'][i]['file_name']
             file_id=data['images'][i]['id']
-            print(img_dir+file_name)
+            #print(img_dir+file_name)
             img=cv2.imread(img_dir+file_name)
-            print(img.shape)
+            #print(img.shape)
             image_new_org=img.copy()
             
             org_bbox_dict={}
@@ -141,7 +141,7 @@ for cat in category_dict.keys():
 
             result = inference_detector(model, img)
             out=show_result_pyplot(model, img, result)
-            print(out)
+            #print(out)
             bbox_pred=out[1]
             classes_pred=out[3] 
             scores_pred=out[4]
@@ -172,10 +172,10 @@ for cat in category_dict.keys():
                 count=0
                 for cl,k,cf in zip(classes_pred,bbox_pred,scores_pred):
                     count=count+1
-                    print('pred cat: '+str(cl))
+                    #print('pred cat: '+str(cl))
                     if cl != catnew:
-                        print('not matching')
-                        print(cl,catnew)
+                        #print('not matching')
+                        #print(cl,catnew)
                         continue
                     area_dict={}
                     r_pred=Rectangle(k[0][0],k[0][1],k[1][0],k[1][1])
@@ -247,7 +247,7 @@ for cat in category_dict.keys():
             annt_dict['tp']=tp_temp
             annt_dict['fp']=fp_temp
             annt_dict['fn']=fn_temp
-            print(annt_dict)
+            #print(annt_dict)
             
             
             data_out.append(annt_dict.copy())
