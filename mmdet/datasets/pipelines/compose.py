@@ -4,6 +4,8 @@ from mmcv.utils import build_from_cfg
 
 from ..builder import PIPELINES
 
+import json
+import copy 
 
 @PIPELINES.register_module()
 class Compose(object):
@@ -35,9 +37,19 @@ class Compose(object):
         Returns:
            dict: Transformed data.
         """
+        origin = copy.deepcopy(data)
 
         for t in self.transforms:
-            data = t(data)
+            try : 
+                data = t(data)
+            except Exception as e:
+                print(e)
+                with open('log.txt','a') as f :
+                    #json.dump(origin,f)
+                    #f.write(str(origin['img_info']['id'])+'\n')
+                    f.write(str(origin['img_info']['file_name'])+'\n')
+                return None
+
             if data is None:
                 return None
         return data
